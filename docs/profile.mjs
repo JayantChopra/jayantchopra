@@ -1,9 +1,11 @@
 const menus = [...document.querySelectorAll('.nav-menu')];
 function positionMenu(menu) {
   const panel = menu.querySelector('.nav-panel');
+  const scale = menu.getBoundingClientRect().width / menu.offsetWidth;
+  panel.style.maxWidth = `${(innerWidth - 32) / scale}px`;
   panel.style.left = '0px';
   const rect = panel.getBoundingClientRect();
-  panel.style.left = `${Math.min(0, innerWidth - 16 - rect.right)}px`;
+  panel.style.left = `${Math.max(16 - rect.left, Math.min(0, innerWidth - 16 - rect.right)) / scale}px`;
 }
 for (const menu of menus) {
   let closeTimer;
@@ -42,7 +44,7 @@ const repositories = [...document.querySelectorAll('.repo-card')];
 hovercard.className = 'repo-hovercard';
 hovercard.hidden = true;
 hovercard.setAttribute('aria-label', 'Repository preview');
-document.querySelector('#profile-scene').append(hovercard);
+document.body.append(hovercard);
 let previewTimer;
 function hideRepository() {
   clearTimeout(previewTimer);

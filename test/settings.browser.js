@@ -3,11 +3,20 @@
   const $ = id => document.getElementById(id);
   const assert = (value, message) => { if (!value) throw Error(message); };
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-  const audio = { contexts: [], tones: 0 };
+  const key = (key, repeat = false) => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, code: key, repeat, bubbles: true, cancelable: true }));
+  const audio = { contexts: [], tones: 0, menu: 0 };
   const NativeAudioContext = window.AudioContext;
   window.AudioContext = class extends NativeAudioContext {
     constructor() { super(); audio.contexts.push(this); }
-    createOscillator() { audio.tones++; return super.createOscillator(); }
+    createOscillator() {
+      const oscillator = super.createOscillator();
+      const set = oscillator.frequency.setValueAtTime.bind(oscillator.frequency);
+      oscillator.frequency.setValueAtTime = (value, time) => {
+        if (value === 740) audio.menu++; else audio.tones++;
+        return set(value, time);
+      };
+      return oscillator;
+    }
   };
   const preview = $('preview-art').textContent;
   await wait(400);
@@ -15,6 +24,31 @@
   $('settings-open').click();
   assert(!$('game-settings').hidden && $('game-cover').inert, 'Settings did not open in the card');
   assert(document.querySelectorAll('input[name="ship"]').length === 4, 'Ship choices missing');
+  key('ArrowDown');
+  assert(document.activeElement === $('audio-tab') && $('audio-panel').hidden, 'Down should focus Audio without selecting it');
+  key('Enter');
+  assert(!$('audio-panel').hidden && document.activeElement === $('music-enabled'), 'Enter should open Audio and focus Music');
+  const music = $('music-enabled').checked;
+  key('Enter');
+  assert($('music-enabled').checked !== music, 'Enter should toggle Music');
+  key('Enter', true);
+  assert($('music-enabled').checked !== music, 'Held Enter toggled Music again');
+  key('Enter');
+  key('ArrowDown');
+  assert(document.activeElement === $('sfx-enabled'), 'Down should focus Sound effects');
+  key('Enter'); key('Enter');
+  key('ArrowDown');
+  assert(document.activeElement === $('settings-close'), 'Down should reach Done');
+  key('ArrowDown');
+  assert(document.activeElement === $('ship-tab'), 'Settings navigation should wrap to Ship');
+  key('Enter');
+  const firstShip = document.activeElement;
+  key('ArrowDown');
+  assert(document.activeElement.value === '1', 'Down should focus the next ship');
+  key('ArrowUp');
+  assert(document.activeElement === firstShip, 'Up should focus the previous ship');
+  key('ArrowDown'); key('Enter');
+  assert(JSON.parse(localStorage.getItem('space-invaders-settings')).ship === 1, 'Enter should select and save the focused ship');
   document.querySelector('input[name="ship"][value="2"]').click();
   assert(JSON.parse(localStorage.getItem('space-invaders-settings')).ship === 2, 'Ship preference was not saved');
   $('ship-tab').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
@@ -27,12 +61,36 @@
   assert(audio.contexts.length === 1, 'Sound settings should share one audio context');
   assert(audio.contexts[0].state === 'running', 'Audio did not unlock after interaction');
   assert(audio.tones === 0, 'Audio must stay quiet on the profile');
+  assert(audio.menu > 0, 'Changing settings should play a navigation cue');
   $('settings-close').click();
   $('enter').click();
   $('profile-scene').getAnimations()[0]?.finish();
   await wait(2100);
   assert(!$('overlay').hidden && $('game-shell').dataset.mode === 'ready', 'Boot did not stop at the title');
   assert(audio.tones === 0, 'Game audio started before Play');
+  const beforeMenu = audio.menu;
+  $('play').dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowDown', bubbles: true }));
+  await wait(80);
+  assert(audio.menu === beforeMenu + 1, 'Keyboard cycling should play one menu tick');
+  $('menu-settings').firstElementChild.dispatchEvent(new PointerEvent('pointerover', { pointerType: 'mouse', relatedTarget: $('menu-settings'), bubbles: true }));
+  await wait(80);
+  assert(audio.menu === beforeMenu + 1, 'Moving within one option played another tick');
+  const profileLink = document.querySelector('.work a');
+  profileLink.dispatchEvent(new PointerEvent('pointerover', { pointerType: 'mouse', bubbles: true }));
+  await wait(80);
+  assert(audio.menu === beforeMenu + 2, 'Profile hover should play a tick outside gameplay');
+  $('settings-open').disabled = true;
+  $('settings-open').dispatchEvent(new PointerEvent('pointerover', { pointerType: 'mouse', bubbles: true }));
+  await wait(80);
+  assert(audio.menu === beforeMenu + 2, 'Disabled controls should stay silent');
+  $('settings-open').disabled = false;
+  $('menu-settings').click();
+  key('Home');
+  assert(document.body.dataset.view === 'game', 'Settings Home key scrolled out of the game');
+  key('Escape');
+  assert($('game-settings').hidden && document.activeElement === $('play') && document.body.dataset.view === 'game', 'Esc should return to Play on the title without zooming out');
+  key('Escape', true);
+  assert(document.body.dataset.view === 'game', 'Held Esc zoomed out after closing Settings');
   $('play').click();
   assert($('overlay').hidden, 'Game failed to launch');
   assert(audio.tones > 0, 'Enabled music did not play');
@@ -55,15 +113,24 @@
   await wait(300);
   $('game').dispatchEvent(new KeyboardEvent('keyup', { code: 'Space', bubbles: true }));
   assert(audio.tones === muted, 'Muted audio still generated sound');
+  const mutedMenu = audio.menu;
+  profileLink.dispatchEvent(new PointerEvent('pointerover', { pointerType: 'mouse', bubbles: true }));
+  await wait(80);
+  assert(audio.menu === mutedMenu, 'SFX mute did not silence navigation cues');
   $('pause').click();
   assert($('game-shell').dataset.mode === 'paused' && $('detail').hidden && $('play').hidden && $('pause').hidden, 'Pause screen contains removed controls or copy');
   $('game').dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyP', bubbles: true }));
   assert($('game-shell').dataset.mode === 'playing', 'P did not unpause');
+  $('settings-open').click();
+  key('Escape');
+  assert($('game-shell').dataset.mode === 'ready' && document.activeElement === $('play'), 'Esc during a round should return to the title, not resume gameplay');
+  $('play').click();
+  assert($('game-shell').dataset.mode === 'playing', 'Play should work after escaping Settings');
   $('profile-view').click();
   $('profile-scene').getAnimations()[0]?.finish();
   await wait(60);
   assert(!$('game-cover').hidden && $('game-console').hidden, 'Return should restore the shooting preview');
   assert(audio.contexts.length === 1, 'Settings leaked audio contexts');
   window.AudioContext = NativeAudioContext;
-  return 'Passed: animated preview, four ships, saved settings, keyboard tabs, music, sound effects, mute, pause, and profile return.';
+  return 'Passed: Settings arrows/Enter/Esc, preview, saved preferences, navigation audio, mute, pause, and profile return.';
 })()

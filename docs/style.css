@@ -191,8 +191,6 @@ summary::-webkit-details-marker { display:none; }
 .footer-brand { display:flex; align-items:center; gap:8px; }
 .footer-brand svg { width:24px; height:24px; }
 body[data-view="zoom"],body[data-view="game"] { overflow:hidden; }
-body[data-view="zoom"] #profile-scene,body[data-view="game"] #profile-scene { pointer-events:none; }
-body[data-view="zoom"] .game-shell,body[data-view="game"] .game-shell { pointer-events:auto; }
 .game-shell { --cell-font:8px; --cell-line:8px; position:relative; width:640px; max-width:100%; height:360px; margin:20px 0 16px; border:1px solid var(--border); border-radius:6px; background:var(--panel); color:var(--text); font-family:var(--mono); overflow:hidden; }
 .game-shell button,.preview-controls button { color:var(--muted); font:10px var(--mono); border:0; background:none; cursor:pointer; padding:6px; min-height:28px; -webkit-tap-highlight-color:transparent; }
 .game-shell button:hover:enabled,.game-shell button:focus-visible,.game-shell button.held { color:#adf0c0; }
@@ -236,6 +234,7 @@ kbd { font:inherit; color:var(--text); }
 .game-settings { position:absolute; inset:32px 0 0; z-index:2; background:var(--panel); padding:16px; overflow:auto; }
 .settings-heading { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .game-settings h2 { font:12px/1.4 var(--mono); color:var(--text); margin:0; }
+.settings-help { font:10px/1.4 var(--mono); color:var(--muted); margin:8px 0; }
 .settings-tabs { display:flex; gap:16px; border-bottom:1px solid var(--border); margin:8px 0 16px; }
 .settings-tabs [role="tab"] { border-bottom:2px solid transparent; border-radius:0; padding:8px 0; }
 .settings-tabs [aria-selected="true"] { color:#adf0c0; border-bottom-color:#adf0c0; }

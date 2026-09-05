@@ -1,4 +1,4 @@
-let context, musicBus, effectsBus, timer, beat = 0;
+let context, musicBus, effectsBus, menuBus, timer, beat = 0;
 let state = { music: false, sfx: false, playing: false };
 
 function tone(bus, frequency, duration, type = 'square', end = frequency) {
@@ -30,6 +30,7 @@ export function setAudioState(next) {
   if (!context) return;
   musicBus.gain.setTargetAtTime(state.playing && state.music ? .28 : 0, context.currentTime, .01);
   effectsBus.gain.setTargetAtTime(state.playing && state.sfx ? .45 : 0, context.currentTime, .01);
+  menuBus.gain.setTargetAtTime(state.sfx ? .14 : 0, context.currentTime, .01);
   const running = state.playing && state.music && context.state === 'running';
   if (running && !timer) { scheduleMusic(); timer = setInterval(scheduleMusic, 180); }
   if (!running && timer) { clearInterval(timer); timer = null; }
@@ -42,8 +43,10 @@ export async function unlockAudio() {
       context = new AudioContext();
       musicBus = context.createGain();
       effectsBus = context.createGain();
+      menuBus = context.createGain();
       musicBus.connect(context.destination);
       effectsBus.connect(context.destination);
+      menuBus.connect(context.destination);
     }
     if (context.state !== 'running') await context.resume();
     setAudioState({});
@@ -57,4 +60,13 @@ export function playSound(name) {
   if (name === 'hit') tone(effectsBus, 220, .12, 'triangle', 45);
   if (name === 'damage') tone(effectsBus, 95, .28, 'sawtooth', 25);
   if (name === 'wave') tone(effectsBus, 330, .3, 'triangle', 880);
+}
+
+export async function playNavigationSound() {
+  if (!state.sfx) return;
+  if (context?.state !== 'running') {
+    // Hover cannot unlock browser audio; wait for a click or keypress, without queuing cues.
+    if (!globalThis.navigator?.userActivation?.hasBeenActive || !await unlockAudio()) return;
+  }
+  if (state.sfx) tone(menuBus, 740, .035, 'square', 520);
 }

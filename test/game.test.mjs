@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { contributions } from '../docs/profile-data.mjs';
 import { createGame, step, chooseUpgrade, upgradeChoices, WIDTH } from '../docs/engine.mjs';
 import { ALIENS, SHIP, SHIPS, TITLE_ART, renderBoard, renderPreview, COLUMNS, ROWS, CELL_W, CELL_H } from '../docs/text-art.mjs';
-import { setAudioState, unlockAudio, playSound } from '../docs/audio.mjs';
+import { setAudioState, unlockAudio, playSound, playNavigationSound } from '../docs/audio.mjs';
 
 const start = () => Object.assign(createGame(), { mode: 'playing' });
 const tick = (game, input = {}, dt = .016) => step(game, input, dt, () => .5);
@@ -205,6 +205,15 @@ await new Promise(resolve => setTimeout(resolve, 220));
 assert.equal(tones, stopped);
 await unlockAudio();
 assert.equal(contexts, 1);
+setAudioState({ sfx: true, playing: false });
+const beforeNavigation = tones;
+await playNavigationSound();
+assert.equal(tones, beforeNavigation + 1, 'Menu cue must work outside gameplay');
+playSound('shot');
+assert.equal(tones, beforeNavigation + 1, 'Gameplay sounds must stay paused');
+setAudioState({ sfx: false });
+await playNavigationSound();
+assert.equal(tones, beforeNavigation + 1, 'SFX mute must silence menu cues');
 delete globalThis.AudioContext;
 
 // The static page must contain every control the game wires up.

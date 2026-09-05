@@ -246,6 +246,7 @@
   var context;
   var musicBus;
   var effectsBus;
+  var menuBus;
   var timer;
   var beat = 0;
   var state = { music: false, sfx: false, playing: false };
@@ -279,6 +280,7 @@
     if (!context) return;
     musicBus.gain.setTargetAtTime(state.playing && state.music ? 0.28 : 0, context.currentTime, 0.01);
     effectsBus.gain.setTargetAtTime(state.playing && state.sfx ? 0.45 : 0, context.currentTime, 0.01);
+    menuBus.gain.setTargetAtTime(state.sfx ? 0.14 : 0, context.currentTime, 0.01);
     const running = state.playing && state.music && context.state === "running";
     if (running && !timer) {
       scheduleMusic();
@@ -296,8 +298,10 @@
         context = new AudioContext();
         musicBus = context.createGain();
         effectsBus = context.createGain();
+        menuBus = context.createGain();
         musicBus.connect(context.destination);
         effectsBus.connect(context.destination);
+        menuBus.connect(context.destination);
       }
       if (context.state !== "running") await context.resume();
       setAudioState({});
@@ -313,14 +317,23 @@
     if (name === "damage") tone(effectsBus, 95, 0.28, "sawtooth", 25);
     if (name === "wave") tone(effectsBus, 330, 0.3, "triangle", 880);
   }
+  async function playNavigationSound() {
+    if (!state.sfx) return;
+    if (context?.state !== "running") {
+      if (!globalThis.navigator?.userActivation?.hasBeenActive || !await unlockAudio()) return;
+    }
+    if (state.sfx) tone(menuBus, 740, 0.035, "square", 520);
+  }
 
   // docs/profile.mjs
   var menus = [...document.querySelectorAll(".nav-menu")];
   function positionMenu(menu) {
     const panel = menu.querySelector(".nav-panel");
+    const scale = menu.getBoundingClientRect().width / menu.offsetWidth;
+    panel.style.maxWidth = `${(innerWidth - 32) / scale}px`;
     panel.style.left = "0px";
     const rect = panel.getBoundingClientRect();
-    panel.style.left = `${Math.min(0, innerWidth - 16 - rect.right)}px`;
+    panel.style.left = `${Math.max(16 - rect.left, Math.min(0, innerWidth - 16 - rect.right)) / scale}px`;
   }
   for (const menu of menus) {
     let closeTimer;
@@ -369,7 +382,7 @@
   hovercard.className = "repo-hovercard";
   hovercard.hidden = true;
   hovercard.setAttribute("aria-label", "Repository preview");
-  document.querySelector("#profile-scene").append(hovercard);
+  document.body.append(hovercard);
   var previewTimer;
   function hideRepository() {
     clearTimeout(previewTimer);
@@ -493,6 +506,30 @@
   } catch {
   }
   setAudioState(preferences);
+  var lastControl;
+  var lastCue = -Infinity;
+  var lastInput = -Infinity;
+  for (const type of ["keydown", "pointerdown"]) {
+    document.addEventListener(type, () => {
+      lastInput = performance.now();
+    }, true);
+  }
+  for (const type of ["pointerover", "focusin", "change"]) {
+    document.addEventListener(type, (event) => {
+      if (booting || document.body.dataset.view === "zoom" || document.hidden) return;
+      if (type === "pointerover" && event.pointerType !== "mouse") return;
+      const now = performance.now();
+      if (type === "focusin" && now - lastInput > 150) return;
+      let control = event.target.closest?.('a[href],button,summary,input[type="radio"],input[type="checkbox"],.ship-choices label,.audio-option');
+      if (!control || control.disabled || control.closest('[hidden],[inert],[aria-disabled="true"]')) return;
+      control = control.closest("label") || control;
+      if (type === "pointerover" && control.contains(event.relatedTarget)) return;
+      if (now - lastCue < 50 || control === lastControl && now - lastCue < 150) return;
+      lastControl = control;
+      lastCue = now;
+      void playNavigationSound();
+    });
+  }
   $("welcome-art").textContent = ALIENS[1][0].join("\n");
   $("title-art").textContent = TITLE_ART;
   $("preview-art").textContent = renderPreview(0, preferences.ship);
@@ -592,10 +629,25 @@
     tab.addEventListener("keydown", (event) => {
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
       event.preventDefault();
+      event.stopPropagation();
       const next = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs[1] : tabs.find((other) => other !== tab);
       selectTab(next);
       next.focus();
     });
+  });
+  settings.addEventListener("keydown", (event) => {
+    if (!["ArrowUp", "ArrowDown", "Enter"].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const controls = [...tabs, ...settings.querySelectorAll('[role="tabpanel"]:not([hidden]) input'), $("settings-close")];
+    if (event.key === "Enter") {
+      if (event.repeat || !controls.includes(event.target)) return;
+      event.target.click();
+      if (tabs.includes(event.target)) $(event.target.getAttribute("aria-controls")).querySelector("input").focus({ preventScroll: true });
+      return;
+    }
+    const index = controls.indexOf(document.activeElement);
+    controls[(index + (event.key === "ArrowDown" ? 1 : -1) + controls.length) % controls.length].focus({ preventScroll: true });
   });
   function closeSettings(resume = true) {
     if (settings.hidden) return;
@@ -625,13 +677,6 @@
   settingsOpen.addEventListener("click", openSettings);
   menuSettings.addEventListener("click", openSettings);
   $("settings-close").addEventListener("click", () => closeSettings());
-  function setSurroundingsInert(inert) {
-    for (let branch = shell; branch !== scene; branch = branch.parentElement) {
-      for (const sibling of branch.parentElement.children) {
-        if (sibling !== branch) sibling.inert = inert;
-      }
-    }
-  }
   function stopAutoIntro() {
     autoIntro = false;
     $("stay-profile").hidden = true;
@@ -711,7 +756,6 @@
     document.dispatchEvent(new Event("profile-exit"));
     focused = true;
     lockScene();
-    setSurroundingsInert(true);
     profile.hidden = false;
     profile.textContent = "[ back to profile ]";
     $("preview-controls").hidden = true;
@@ -731,7 +775,6 @@
     scene.removeAttribute("style");
     document.body.style.height = "";
     document.body.dataset.view = "profile";
-    setSurroundingsInert(false);
     board.tabIndex = -1;
     consolePanel.hidden = true;
     cover.hidden = false;
@@ -741,23 +784,58 @@
     scrollTo(0, savedScroll);
     enter.focus({ preventScroll: true });
   }
-  async function showProfile(animate = true) {
+  async function showProfile(animate = true, reset = false, scrollDelta = 0) {
     stopAutoIntro();
     if (scene.style.position !== "fixed") return;
     closeSettings(false);
+    document.dispatchEvent(new Event("profile-exit"));
     focused = false;
     clearTimeout(bootTimer);
     booting = false;
     boot.hidden = true;
     clearInput();
+    if (reset) {
+      game = createGame();
+      titleScreen = true;
+      savedScroll = Math.max(0, Math.min(scene.scrollHeight - innerHeight, savedScroll + scrollDelta));
+    }
     if (game.mode === "playing") game.mode = "paused";
     lastMode = "";
     updateUI();
     profile.textContent = "[ enter game ]";
     settingsOpen.disabled = true;
     document.body.dataset.view = "zoom";
-    if (await moveCamera(cameraPose(1, 0, -savedScroll), animate, 1800) && !focused) restoreProfile();
+    if (await moveCamera(cameraPose(1, 0, -savedScroll), animate, reset ? 1e3 : 1800) && !focused) restoreProfile();
   }
+  function scrollOut(event, delta) {
+    if (!delta || scene.style.position !== "fixed") return;
+    const panel = event.target.closest?.("#game-settings,.nav-panel,.calendar-scroll");
+    if (panel && (delta > 0 ? panel.scrollTop + panel.clientHeight < panel.scrollHeight - 1 : panel.scrollTop > 0)) return;
+    event.preventDefault();
+    if (focused) showProfile(true, true, delta);
+  }
+  window.addEventListener("wheel", (event) => {
+    if (!event.ctrlKey) scrollOut(event, event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1));
+  }, { passive: false });
+  var scrollTouchY = null;
+  window.addEventListener("touchstart", (event) => {
+    scrollTouchY = event.touches.length === 1 && !event.target.closest("#playfield") ? event.touches[0].clientY : null;
+  }, { passive: true });
+  window.addEventListener("touchmove", (event) => {
+    if (event.touches.length !== 1) {
+      scrollTouchY = null;
+      return;
+    }
+    if (scrollTouchY === null) return;
+    const delta = scrollTouchY - event.touches[0].clientY;
+    if (Math.abs(delta) > 8) {
+      scrollOut(event, delta);
+      scrollTouchY = event.touches[0].clientY;
+    }
+  }, { passive: false });
+  window.addEventListener("touchend", () => {
+    scrollTouchY = null;
+  }, { passive: true });
   enter.addEventListener("click", () => focusGame());
   $("skip-intro").addEventListener("click", () => focusGame());
   $("stay-profile").addEventListener("click", () => showProfile());
@@ -793,8 +871,26 @@
     });
   }
   document.addEventListener("keydown", (event) => {
+    if (event.code === "Escape" && event.repeat) return;
+    if (!event.target.closest?.('input,textarea,select,[contenteditable="true"]')) {
+      const delta = { PageDown: innerHeight * 0.8, PageUp: -innerHeight * 0.8, End: scene.scrollHeight, Home: -scene.scrollHeight }[event.code];
+      if (delta) {
+        scrollOut(event, delta);
+        return;
+      }
+      if (!shell.contains(event.target) && ["ArrowDown", "ArrowUp", "Space"].includes(event.code)) {
+        scrollOut(event, event.code === "ArrowUp" ? -40 : event.code === "Space" ? innerHeight * 0.8 : 40);
+      }
+    }
     if (event.code === "Escape" && !settings.hidden) {
-      closeSettings();
+      event.preventDefault();
+      closeSettings(false);
+      if (focused) {
+        titleScreen = true;
+        clearInput();
+        lastMode = "";
+        updateUI();
+      }
       return;
     }
     if (event.code === "Escape" && focused) {
@@ -825,6 +921,13 @@
     }
   });
   document.addEventListener("keyup", (event) => keys.delete(event.code));
+  shell.addEventListener("focusout", (event) => {
+    if (game.mode === "playing" && event.relatedTarget && !shell.contains(event.relatedTarget)) {
+      game.mode = "paused";
+      clearInput();
+      updateUI();
+    }
+  });
   var field = $("playfield");
   function moveTouch(event) {
     if (event.pointerType === "mouse" || event.pointerId !== touchPointer || game.mode !== "playing") return;
@@ -925,7 +1028,7 @@
     if (!titleScreen) {
       clearInput();
       announcement.textContent = game.mode === "paused" ? "Game paused." : `Game over. Score ${game.score}.`;
-      if (focused && document.body.dataset.view === "game") (game.mode === "paused" ? board : play).focus({ preventScroll: true });
+      if (focused && document.body.dataset.view === "game" && shell.contains(document.activeElement)) (game.mode === "paused" ? board : play).focus({ preventScroll: true });
     }
     if (titleScreen && focused && !booting && settings.hidden && document.body.dataset.view === "game") {
       play.focus({ preventScroll: true });
