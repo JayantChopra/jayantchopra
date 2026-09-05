@@ -1,0 +1,27 @@
+Text-art sources
+
+Ship, invaders, and explosion shapes adapted from Alternate Space Invaders
+by WaffleKilometer, released under CC0 (public domain).
+
+https://opengameart.org/content/alternate-space-invaders
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Conversion: each pair of source pixel rows becomes a row of Unicode half-block
+characters (space, ▀, ▄, █). Two original poses provide the alien animation.
+The playable board uses text; it does not load the source sprite image.
+
+Borders and controls use standard Unicode box-drawing characters.
+
+Profile intro
+
+Public profile content and contribution pattern captured from
+https://github.com/JayantChopra on September 5, 2026. Counts and activity are
+a dated snapshot, not a live connection to GitHub.
+
+Profile photo: Jay Chopra, via avatars.githubusercontent.com.
+Achievement badges: GitHub, via github.githubassets.com.
+Organization avatars: https://github.com/stanwith and https://github.com/graypass-org.
+Header menus and activity chart geometry: GitHub's public profile, September 5, 2026.
+GitHub Octicons: https://github.com/primer/octicons
+Icon license: assets/LICENSE-octicons.txt (MIT).
+GitHub, X, and LinkedIn marks belong to their respective owners.
