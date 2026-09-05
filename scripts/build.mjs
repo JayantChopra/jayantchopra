@@ -37,8 +37,5 @@ writeFileSync(new URL('../docs/preview.svg', import.meta.url), `<svg xmlns="http
   <text x="28" y="162" font-size="20" font-weight="600" fill="#e6edf3"># Space Invaders</text>
   <text x="28" y="187" font-size="11" fill="#a1abb6">A game made of text.</text>
   <text x="28" y="231" font-size="12" fill="#adf0c0">[ enter game ]</text>
-  <text x="70" y="256" font-size="18" fill="#adf0c0">↑</text>
-  <text x="70" y="274" font-size="18" fill="#adf0c0">│</text>
-  <text x="28" y="302" font-size="11" fill="#a1abb6">Play the game you see above</text>
   <g xml:space="preserve" font-size="9" fill="#c9d1d9">${frames}</g>
 </svg>\n`);
