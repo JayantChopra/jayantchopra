@@ -20,9 +20,12 @@
       return oscillator;
     }
   };
-  const preview = $('preview-art').textContent;
+  // A previous verification run can leave effects muted in this browser.
+  if (!$('sfx-enabled').checked) $('sfx-enabled').click();
+  const previewFrames = () => [...$('preview-art').querySelectorAll('.preview-frame')].map(frame => getComputedStyle(frame).opacity).join(',');
+  const preview = previewFrames();
   await wait(400);
-  assert($('preview-art').textContent !== preview, 'Attract-mode preview does not animate');
+  assert(previewFrames() !== preview, 'Attract-mode preview does not animate');
   $('settings-open').click();
   assert(!$('game-settings').hidden && $('game-cover').inert, 'Settings did not open in the card');
   assert(document.querySelectorAll('input[name="ship"]').length === 4, 'Ship choices missing');

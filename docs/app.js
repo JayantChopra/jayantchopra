@@ -242,6 +242,32 @@
     game2.bombs = game2.bombs.filter((bomb) => bomb.active && bomb.y < HEIGHT && bomb.x + bomb.w > 0 && bomb.x < WIDTH);
   }
 
+  // docs/preview.mjs
+  function previewSvg(ship = 0) {
+    const frames = Array.from({ length: 16 }, (_, i) => `<g class="preview-frame" style="animation-delay:${i / 8 - 2}s">${renderPreview(i / 8, ship).split("\n").map((line, row) => `<text x="382" y="${132 + row * 9}">${line}</text>`).join("")}</g>`).join("");
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="preview-title preview-desc">
+  <title id="preview-title">Space Invaders. Click to enter the game.</title>
+  <desc id="preview-desc">A ship fires at aliens drawn with text characters.</desc>
+  <style>
+    .profile-preview text { font-family:Menlo,Consolas,"DejaVu Sans Mono",monospace; white-space:pre; font-variant-ligatures:none; }
+    .preview-frame { opacity:0; animation:preview-frame 2s steps(1,end) infinite; }
+    @keyframes preview-frame { 0%,6.249% { opacity:1; } 6.25%,100% { opacity:0; } }
+    @media (prefers-reduced-motion:reduce) { .preview-frame { animation:none; } .preview-frame:first-child { opacity:1; } }
+  </style>
+  <g class="profile-preview">
+    <rect x=".5" y=".5" width="639" height="359" rx="5" fill="#151b23" stroke="#3d444d"/>
+    <path d="M1 32h638" stroke="#3d444d"/>
+    <text x="12" y="21" font-size="10" fill="#a1abb6">jayantchopra / <tspan fill="#e6edf3">Space Invaders</tspan></text>
+    <text x="622" y="21" text-anchor="end" font-size="9" fill="#9198a1">[ settings ]</text>
+    <text x="28" y="162" font-size="20" font-weight="600" fill="#e6edf3"># Space Invaders</text>
+    <text x="28" y="187" font-size="11" fill="#a1abb6">A game made of text.</text>
+    <text x="28" y="231" font-size="12" fill="#adf0c0">[ enter game ]</text>
+    <g xml:space="preserve" font-size="9" fill="#c9d1d9">${frames}</g>
+  </g>
+</svg>
+`;
+  }
+
   // docs/audio.mjs
   var context;
   var musicBus;
@@ -329,6 +355,12 @@
 
   // docs/profile.mjs
   var menus = [...document.querySelectorAll(".nav-menu")];
+  var mobileMenu = document.querySelector(".mobile-menu-toggle");
+  function setMobileMenu(open) {
+    mobileMenu.setAttribute("aria-expanded", String(open));
+    document.querySelector(".github-header").classList.toggle("mobile-nav-open", open);
+  }
+  mobileMenu.addEventListener("click", () => setMobileMenu(mobileMenu.getAttribute("aria-expanded") !== "true"));
   function positionMenu(menu) {
     const panel = menu.querySelector(".nav-panel");
     const scale = menu.getBoundingClientRect().width / menu.offsetWidth;
@@ -376,6 +408,9 @@
     if (menu) {
       menu.open = false;
       menu.querySelector("summary").focus();
+    } else if (mobileMenu.getAttribute("aria-expanded") === "true") {
+      setMobileMenu(false);
+      mobileMenu.focus();
     }
     hideRepository();
   });
@@ -434,6 +469,7 @@
   });
   document.addEventListener("profile-exit", () => {
     hideRepository();
+    setMobileMenu(false);
     menus.forEach((menu) => {
       menu.open = false;
     });
@@ -490,7 +526,6 @@
   var titleScreen = true;
   var booting = false;
   var touchPointer = null;
-  var lastPreview = -1;
   var resumeAfterSettings = false;
   var firePressed = false;
   var preferences = { ship: 0, music: true, sfx: true };
@@ -535,7 +570,7 @@
   }
   $("welcome-art").textContent = ALIENS[1][0].join("\n");
   $("title-art").textContent = TITLE_ART;
-  $("preview-art").textContent = renderPreview(0, preferences.ship);
+  $("preview-art").innerHTML = previewSvg(preferences.ship);
   board.textContent = renderBoard(game, reducedMotion.matches, preferences.ship);
   var measure = document.createElement("span");
   measure.style.cssText = "position:absolute;visibility:hidden;font:10px var(--mono)";
@@ -592,7 +627,7 @@
     }
     setAudioState(preferences);
     board.textContent = renderBoard(game, reducedMotion.matches, preferences.ship);
-    lastPreview = -1;
+    $("preview-art").innerHTML = previewSvg(preferences.ship);
   }
   SHIPS.forEach((ship, index) => {
     const label = document.createElement("label"), input = document.createElement("input");
@@ -1006,6 +1041,7 @@
     $("detail").hidden = ["paused", "upgrade"].includes(mode) || titleScreen;
     const upgrades = $("upgrade-options");
     upgrades.hidden = mode !== "upgrade";
+    fitBoard();
     if (mode === "upgrade") {
       clearInput();
       upgrades.replaceChildren(...upgradeChoices(game).map((choice) => {
@@ -1056,11 +1092,6 @@
       const text = renderBoard(game, reducedMotion.matches, preferences.ship);
       if (board.textContent !== text) board.textContent = text;
       lastDraw = now;
-    }
-    const previewFrame = reducedMotion.matches ? 0 : Math.floor(now / 125);
-    if (!cover.hidden && settings.hidden && !document.hidden && previewFrame !== lastPreview) {
-      $("preview-art").textContent = renderPreview(previewFrame / 8, preferences.ship, reducedMotion.matches);
-      lastPreview = previewFrame;
     }
     updateUI();
     requestAnimationFrame(frame);

@@ -1,4 +1,10 @@
 const menus = [...document.querySelectorAll('.nav-menu')];
+const mobileMenu = document.querySelector('.mobile-menu-toggle');
+function setMobileMenu(open) {
+  mobileMenu.setAttribute('aria-expanded', String(open));
+  document.querySelector('.github-header').classList.toggle('mobile-nav-open', open);
+}
+mobileMenu.addEventListener('click', () => setMobileMenu(mobileMenu.getAttribute('aria-expanded') !== 'true'));
 function positionMenu(menu) {
   const panel = menu.querySelector('.nav-panel');
   const scale = menu.getBoundingClientRect().width / menu.offsetWidth;
@@ -36,6 +42,7 @@ document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   const menu = menus.find(item => item.open);
   if (menu) { menu.open = false; menu.querySelector('summary').focus(); }
+  else if (mobileMenu.getAttribute('aria-expanded') === 'true') { setMobileMenu(false); mobileMenu.focus(); }
   hideRepository();
 });
 
@@ -83,7 +90,7 @@ hovercard.addEventListener('focusout', event => { if (!hovercard.contains(event.
 document.addEventListener('click', event => { if (!hovercard.contains(event.target)) hideRepository(); });
 window.addEventListener('scroll', hideRepository, { passive: true });
 window.addEventListener('resize', () => { hideRepository(); menus.filter(menu => menu.open).forEach(positionMenu); });
-document.addEventListener('profile-exit', () => { hideRepository(); menus.forEach(menu => { menu.open = false; }); });
+document.addEventListener('profile-exit', () => { hideRepository(); setMobileMenu(false); menus.forEach(menu => { menu.open = false; }); });
 
 const mobileTabs = document.querySelector('.profile-tabs').cloneNode(true);
 mobileTabs.classList.add('mobile-tabs');

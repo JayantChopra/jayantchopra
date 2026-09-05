@@ -1,5 +1,6 @@
 import { createGame, step, chooseUpgrade, upgradeChoices, WIDTH } from './engine.mjs';
-import { ALIENS, SHIPS, TITLE_ART, renderBoard, renderPreview, COLUMNS, ROWS } from './text-art.mjs';
+import { ALIENS, SHIPS, TITLE_ART, renderBoard, COLUMNS, ROWS } from './text-art.mjs';
+import { previewSvg } from './preview.mjs';
 import { setAudioState, unlockAudio, playSound, playNavigationSound } from './audio.mjs';
 import './profile.mjs';
 
@@ -18,7 +19,7 @@ const storageKey = 'space-invaders-best';
 let game = createGame(), best = 0, previous = 0, lastDraw = 0, lastMode = '';
 let lastWave = 1, lastLives = 3, bootTimer;
 let camera, transition = 0, savedScroll = 0, focused = false, titleScreen = true, booting = false;
-let touchPointer = null, lastPreview = -1, resumeAfterSettings = false;
+let touchPointer = null, resumeAfterSettings = false;
 let firePressed = false;
 const preferences = { ship: 0, music: true, sfx: true };
 let autoIntro = location.protocol !== 'file:' && !new URLSearchParams(location.search).has('profile');
@@ -58,7 +59,7 @@ for (const type of ['pointerover', 'focusin', 'change']) {
 
 $('welcome-art').textContent = ALIENS[1][0].join('\n');
 $('title-art').textContent = TITLE_ART;
-$('preview-art').textContent = renderPreview(0, preferences.ship);
+$('preview-art').innerHTML = previewSvg(preferences.ship);
 board.textContent = renderBoard(game, reducedMotion.matches, preferences.ship);
 const measure = document.createElement('span');
 measure.style.cssText = 'position:absolute;visibility:hidden;font:10px var(--mono)';
@@ -114,7 +115,7 @@ function savePreferences() {
   try { localStorage.setItem('space-invaders-settings', JSON.stringify(preferences)); } catch { /* Preferences still work for this visit. */ }
   setAudioState(preferences);
   board.textContent = renderBoard(game, reducedMotion.matches, preferences.ship);
-  lastPreview = -1;
+  $('preview-art').innerHTML = previewSvg(preferences.ship);
 }
 
 SHIPS.forEach((ship, index) => {
@@ -503,6 +504,7 @@ function updateUI() {
   $('detail').hidden = ['paused', 'upgrade'].includes(mode) || titleScreen;
   const upgrades = $('upgrade-options');
   upgrades.hidden = mode !== 'upgrade';
+  fitBoard();
   if (mode === 'upgrade') {
     clearInput();
     upgrades.replaceChildren(...upgradeChoices(game).map(choice => {
@@ -555,11 +557,6 @@ function frame(now) {
     const text = renderBoard(game, reducedMotion.matches, preferences.ship);
     if (board.textContent !== text) board.textContent = text;
     lastDraw = now;
-  }
-  const previewFrame = reducedMotion.matches ? 0 : Math.floor(now / 125);
-  if (!cover.hidden && settings.hidden && !document.hidden && previewFrame !== lastPreview) {
-    $('preview-art').textContent = renderPreview(previewFrame / 8, preferences.ship, reducedMotion.matches);
-    lastPreview = previewFrame;
   }
   updateUI();
   requestAnimationFrame(frame);

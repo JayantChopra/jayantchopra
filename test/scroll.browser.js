@@ -20,7 +20,7 @@
   });
   await enter();
   assert(!document.querySelector('.sidebar').inert, 'Zoomed profile must stay interactive');
-  const link = $('arcade-link'), rect = link.getBoundingClientRect();
+  const link = document.querySelector('.socials a'), rect = link.getBoundingClientRect();
   assert(getComputedStyle(link).pointerEvents === 'auto', 'Profile link blocks the pointer');
   const hit = document.elementFromPoint(rect.left + 8, rect.top + rect.height / 2);
   assert(hit === link || link.contains(hit), 'Visible profile link cannot be hovered');

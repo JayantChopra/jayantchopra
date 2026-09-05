@@ -5,6 +5,7 @@ import { contributions } from '../docs/profile-data.mjs';
 import { createGame, step, chooseUpgrade, upgradeChoices, WIDTH } from '../docs/engine.mjs';
 import { ALIENS, SHIP, SHIPS, TITLE_ART, renderBoard, renderPreview, COLUMNS, ROWS, CELL_W, CELL_H } from '../docs/text-art.mjs';
 import { setAudioState, unlockAudio, playSound, playNavigationSound } from '../docs/audio.mjs';
+import { previewSvg } from '../docs/preview.mjs';
 
 const start = () => Object.assign(createGame(), { mode: 'playing' });
 const tick = (game, input = {}, dt = .016) => step(game, input, dt, () => .5);
@@ -262,9 +263,12 @@ const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.doesNotMatch(readme, /If only GitHub allowed this|Play the game you see above/);
 assert.equal((readme.match(/href="https:\/\/jayantchopra.github.io\/jayantchopra\/"/g) || []).length, 1);
 const previewVersion = createHash('sha256').update(readFileSync(new URL('../docs/preview.svg', import.meta.url))).digest('hex').slice(0, 12);
+assert.equal(readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8'), previewSvg(), 'README and mock artwork must match');
+assert.doesNotMatch(html, /<\/\//, 'Malformed closing tag');
 assert.ok(readme.includes(`<a href="https://jayantchopra.github.io/jayantchopra/"><img src="docs/preview.svg?v=${previewVersion}"`));
 assert.doesNotMatch(readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8'), /Play the game you see above|↑/);
-assert.match(html, /id="arcade-link" href="https:\/\/github.com\/JayantChopra">Back to the boring GitHub\.\.\.<\/a>/);
+assert.doesNotMatch(html, /id="arcade-link"|Back to the boring GitHub/);
+assert.match(readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8'), /\[ settings \]/);
 assert.doesNotMatch(controller, /\$\('arcade-link'\)\.addEventListener|Hold space to fire/);
 assert.equal((readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8').match(/class="preview-frame"/g) || []).length, 16);
 
