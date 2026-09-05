@@ -245,6 +245,8 @@ assert.doesNotMatch(html, /where i work\/ed|best score saved in this browser|dat
 assert.doesNotMatch(controller, /Your game is right where you left it|\[ resume \]/);
 const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.ok(readme.includes('If only GitHub allowed this...'));
+assert.match(readme, /<a href="https:\/\/jayantchopra.github.io\/jayantchopra\/">\s*<img src="docs\/preview.svg"/);
+assert.match(readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8'), /Play the game you see above/);
 assert.match(html, /id="arcade-link" href="https:\/\/github.com\/JayantChopra">Back to the boring GitHub\.\.\.<\/a>/);
 assert.doesNotMatch(controller, /\$\('arcade-link'\)\.addEventListener|Hold space to fire/);
 assert.equal((readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8').match(/class="preview-frame"/g) || []).length, 16);
