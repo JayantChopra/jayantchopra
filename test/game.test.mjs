@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { contributions } from '../docs/profile-data.mjs';
 import { createGame, step, chooseUpgrade, upgradeChoices, WIDTH } from '../docs/engine.mjs';
 import { ALIENS, SHIP, SHIPS, TITLE_ART, renderBoard, renderPreview, COLUMNS, ROWS, CELL_W, CELL_H } from '../docs/text-art.mjs';
@@ -246,7 +247,8 @@ assert.doesNotMatch(controller, /Your game is right where you left it|\[ resume 
 const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 assert.doesNotMatch(readme, /If only GitHub allowed this|Play the game you see above/);
 assert.equal((readme.match(/href="https:\/\/jayantchopra.github.io\/jayantchopra\/"/g) || []).length, 1);
-assert.match(readme, /<a href="https:\/\/jayantchopra.github.io\/jayantchopra\/">\s*<img src="docs\/preview.svg"/);
+const previewVersion = createHash('sha256').update(readFileSync(new URL('../docs/preview.svg', import.meta.url))).digest('hex').slice(0, 12);
+assert.ok(readme.includes(`<a href="https://jayantchopra.github.io/jayantchopra/"><img src="docs/preview.svg?v=${previewVersion}"`));
 assert.doesNotMatch(readFileSync(new URL('../docs/preview.svg', import.meta.url), 'utf8'), /Play the game you see above|↑/);
 assert.match(html, /id="arcade-link" href="https:\/\/github.com\/JayantChopra">Back to the boring GitHub\.\.\.<\/a>/);
 assert.doesNotMatch(controller, /\$\('arcade-link'\)\.addEventListener|Hold space to fire/);

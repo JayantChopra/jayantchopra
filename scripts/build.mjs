@@ -1,5 +1,6 @@
 import './inline-icons.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { contributions } from '../docs/profile-data.mjs';
 import { renderPreview } from '../docs/text-art.mjs';
 
@@ -39,3 +40,9 @@ writeFileSync(new URL('../docs/preview.svg', import.meta.url), `<svg xmlns="http
   <text x="28" y="231" font-size="12" fill="#adf0c0">[ enter game ]</text>
   <g xml:space="preserve" font-size="9" fill="#c9d1d9">${frames}</g>
 </svg>\n`);
+
+// Change the README image URL whenever its contents change, avoiding stale image caches.
+const preview = readFileSync(new URL('../docs/preview.svg', import.meta.url));
+const version = createHash('sha256').update(preview).digest('hex').slice(0, 12);
+const readme = new URL('../README.md', import.meta.url);
+writeFileSync(readme, readFileSync(readme, 'utf8').replace(/src="docs\/preview\.svg(?:\?v=[^"]*)?"/, `src="docs/preview.svg?v=${version}"`));
