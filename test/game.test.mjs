@@ -210,6 +210,8 @@ delete globalThis.AudioContext;
 // The static page must contain every control the game wires up.
 const html = readFileSync(new URL('../docs/index.html', import.meta.url), 'utf8');
 const controller = readFileSync(new URL('../docs/game.mjs', import.meta.url), 'utf8');
+assert.doesNotMatch(controller, /introTimer|\$\('avatar'\)\.decode\(\)/, 'Entry must not wait on a timer or the avatar');
+assert.match(controller, /requestAnimationFrame\(\(\) => \{\s*if \(autoIntro && document.body.dataset.view === 'profile'\) focusGame\(\);/);
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'HTML IDs must be unique');
 for (const [, id] of controller.matchAll(/\$\('([^']+)'\)/g)) assert.ok(ids.includes(id), `Missing game control: ${id}`);

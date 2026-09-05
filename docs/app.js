@@ -467,7 +467,6 @@
   var lastMode = "";
   var lastWave = 1;
   var lastLives = 3;
-  var introTimer;
   var bootTimer;
   var camera;
   var transition = 0;
@@ -635,7 +634,6 @@
   }
   function stopAutoIntro() {
     autoIntro = false;
-    clearTimeout(introTimer);
     $("stay-profile").hidden = true;
     $("skip-intro").textContent = "[ play intro ]";
   }
@@ -962,8 +960,8 @@
     $("stay-profile").hidden = true;
     $("skip-intro").textContent = "[ play intro ]";
   }
-  Promise.allSettled([$("avatar").decode(), document.fonts.ready]).then(() => {
-    if (autoIntro && document.body.dataset.view === "profile") introTimer = setTimeout(() => focusGame(), reducedMotion.matches ? 0 : 1800);
+  requestAnimationFrame(() => {
+    if (autoIntro && document.body.dataset.view === "profile") focusGame();
   });
   requestAnimationFrame(frame);
 })();

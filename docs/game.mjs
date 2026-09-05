@@ -16,7 +16,7 @@ let settingsTrigger = settingsOpen;
 const keyControls = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
 const storageKey = 'space-invaders-best';
 let game = createGame(), best = 0, previous = 0, lastDraw = 0, lastMode = '';
-let lastWave = 1, lastLives = 3, introTimer, bootTimer;
+let lastWave = 1, lastLives = 3, bootTimer;
 let camera, transition = 0, savedScroll = 0, focused = false, titleScreen = true, booting = false;
 let touchPointer = null, lastPreview = -1, resumeAfterSettings = false;
 let firePressed = false;
@@ -169,7 +169,6 @@ function setSurroundingsInert(inert) {
 
 function stopAutoIntro() {
   autoIntro = false;
-  clearTimeout(introTimer);
   $('stay-profile').hidden = true;
   $('skip-intro').textContent = '[ play intro ]';
 }
@@ -488,7 +487,7 @@ if (!autoIntro) {
   $('stay-profile').hidden = true;
   $('skip-intro').textContent = '[ play intro ]';
 }
-Promise.allSettled([$('avatar').decode(), document.fonts.ready]).then(() => {
-  if (autoIntro && document.body.dataset.view === 'profile') introTimer = setTimeout(() => focusGame(), reducedMotion.matches ? 0 : 1800);
+requestAnimationFrame(() => {
+  if (autoIntro && document.body.dataset.view === 'profile') focusGame();
 });
 requestAnimationFrame(frame);
