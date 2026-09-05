@@ -211,9 +211,12 @@ await playNavigationSound();
 assert.equal(tones, beforeNavigation + 1, 'Menu cue must work outside gameplay');
 playSound('shot');
 assert.equal(tones, beforeNavigation + 1, 'Gameplay sounds must stay paused');
+await playNavigationSound('select');
+assert.equal(tones, beforeNavigation + 2, 'Ship confirmation must work outside gameplay');
 setAudioState({ sfx: false });
 await playNavigationSound();
-assert.equal(tones, beforeNavigation + 1, 'SFX mute must silence menu cues');
+await playNavigationSound('select');
+assert.equal(tones, beforeNavigation + 2, 'SFX mute must silence navigation and confirmation cues');
 delete globalThis.AudioContext;
 
 // The static page must contain every control the game wires up.

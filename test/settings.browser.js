@@ -4,7 +4,7 @@
   const assert = (value, message) => { if (!value) throw Error(message); };
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
   const key = (key, repeat = false) => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, code: key, repeat, bubbles: true, cancelable: true }));
-  const audio = { contexts: [], tones: 0, menu: 0 };
+  const audio = { contexts: [], tones: 0, menu: 0, selections: 0 };
   const NativeAudioContext = window.AudioContext;
   window.AudioContext = class extends NativeAudioContext {
     constructor() { super(); audio.contexts.push(this); }
@@ -12,7 +12,9 @@
       const oscillator = super.createOscillator();
       const set = oscillator.frequency.setValueAtTime.bind(oscillator.frequency);
       oscillator.frequency.setValueAtTime = (value, time) => {
-        if (value === 740) audio.menu++; else audio.tones++;
+        if (value === 740) audio.menu++;
+        else if (value === 880) audio.selections++;
+        else audio.tones++;
         return set(value, time);
       };
       return oscillator;
@@ -49,8 +51,27 @@
   assert(document.activeElement === firstShip, 'Up should focus the previous ship');
   key('ArrowDown'); key('Enter');
   assert(JSON.parse(localStorage.getItem('space-invaders-settings')).ship === 1, 'Enter should select and save the focused ship');
+  await wait(80);
+  const selectedShip = document.activeElement;
+  const beforeCycling = audio.menu;
+  const beforeSelection = audio.selections;
+  for (const arrow of ['ArrowRight', 'ArrowDown', 'ArrowUp', 'ArrowLeft']) {
+    key(arrow);
+    await wait(80);
+    assert(selectedShip.checked && JSON.parse(localStorage.getItem('space-invaders-settings')).ship === 1, 'Cycling should not change the selected ship');
+    assert(getComputedStyle(selectedShip.parentElement).color === 'rgb(173, 240, 192)', 'Chosen ship should stay green while cycling');
+  }
+  assert(audio.menu === beforeCycling + 4, 'Each arrow movement should play a cycling cue');
+  assert(audio.selections === beforeSelection, 'Browsing ships should not play a confirmation');
+  key('Enter');
+  assert(audio.selections === beforeSelection + 1, 'Enter should confirm even an already-selected ship');
+  key('Enter', true);
+  assert(audio.selections === beforeSelection + 1, 'Held Enter should not repeat confirmation sounds');
+  assert(document.querySelector('.settings-help').textContent.startsWith('use arrow keys'), 'Settings hint should mention all arrow keys');
   document.querySelector('input[name="ship"][value="2"]').click();
   assert(JSON.parse(localStorage.getItem('space-invaders-settings')).ship === 2, 'Ship preference was not saved');
+  assert(audio.selections === beforeSelection + 2, 'Click should play one confirmation sound');
+  assert(!selectedShip.checked && getComputedStyle(selectedShip.parentElement).color !== 'rgb(173, 240, 192)', 'Old ship should lose its green selection');
   $('ship-tab').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
   assert($('audio-tab').getAttribute('aria-selected') === 'true' && !$('audio-panel').hidden, 'Settings tab keyboard navigation failed');
   for (const id of ['music-enabled', 'sfx-enabled']) {
@@ -122,6 +143,10 @@
   $('game').dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyP', bubbles: true }));
   assert($('game-shell').dataset.mode === 'playing', 'P did not unpause');
   $('settings-open').click();
+  $('ship-tab').click();
+  const selectedBeforeMute = audio.selections;
+  document.querySelector('input[name="ship"][value="2"]').click();
+  assert(audio.selections === selectedBeforeMute, 'SFX mute should silence ship confirmations');
   key('Escape');
   assert($('game-shell').dataset.mode === 'ready' && document.activeElement === $('play'), 'Esc during a round should return to the title, not resume gameplay');
   $('play').click();

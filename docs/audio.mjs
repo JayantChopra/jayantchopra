@@ -62,11 +62,13 @@ export function playSound(name) {
   if (name === 'wave') tone(effectsBus, 330, .3, 'triangle', 880);
 }
 
-export async function playNavigationSound() {
+export async function playNavigationSound(action = 'move') {
   if (!state.sfx) return;
   if (context?.state !== 'running') {
     // Hover cannot unlock browser audio; wait for a click or keypress, without queuing cues.
     if (!globalThis.navigator?.userActivation?.hasBeenActive || !await unlockAudio()) return;
   }
-  if (state.sfx) tone(menuBus, 740, .035, 'square', 520);
+  if (!state.sfx) return;
+  if (action === 'select') tone(menuBus, 880, .09, 'triangle', 1320);
+  else tone(menuBus, 740, .035, 'square', 520);
 }

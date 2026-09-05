@@ -317,12 +317,14 @@
     if (name === "damage") tone(effectsBus, 95, 0.28, "sawtooth", 25);
     if (name === "wave") tone(effectsBus, 330, 0.3, "triangle", 880);
   }
-  async function playNavigationSound() {
+  async function playNavigationSound(action = "move") {
     if (!state.sfx) return;
     if (context?.state !== "running") {
       if (!globalThis.navigator?.userActivation?.hasBeenActive || !await unlockAudio()) return;
     }
-    if (state.sfx) tone(menuBus, 740, 0.035, "square", 520);
+    if (!state.sfx) return;
+    if (action === "select") tone(menuBus, 880, 0.09, "triangle", 1320);
+    else tone(menuBus, 740, 0.035, "square", 520);
   }
 
   // docs/profile.mjs
@@ -518,6 +520,7 @@
     document.addEventListener(type, (event) => {
       if (booting || document.body.dataset.view === "zoom" || document.hidden) return;
       if (type === "pointerover" && event.pointerType !== "mouse") return;
+      if (type === "change" && event.target.matches('input[name="ship"]')) return;
       const now = performance.now();
       if (type === "focusin" && now - lastInput > 150) return;
       let control = event.target.closest?.('a[href],button,summary,input[type="radio"],input[type="checkbox"],.ship-choices label,.audio-option');
@@ -607,6 +610,9 @@
       preferences.ship = index;
       savePreferences();
     });
+    input.addEventListener("click", () => {
+      void playNavigationSound("select");
+    });
   });
   for (const [id, key] of [["music-enabled", "music"], ["sfx-enabled", "sfx"]]) {
     $(id).checked = preferences[key];
@@ -636,7 +642,7 @@
     });
   });
   settings.addEventListener("keydown", (event) => {
-    if (!["ArrowUp", "ArrowDown", "Enter"].includes(event.key)) return;
+    if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter"].includes(event.key)) return;
     event.preventDefault();
     event.stopPropagation();
     const controls = [...tabs, ...settings.querySelectorAll('[role="tabpanel"]:not([hidden]) input'), $("settings-close")];
@@ -647,7 +653,7 @@
       return;
     }
     const index = controls.indexOf(document.activeElement);
-    controls[(index + (event.key === "ArrowDown" ? 1 : -1) + controls.length) % controls.length].focus({ preventScroll: true });
+    controls[(index + (["ArrowDown", "ArrowRight"].includes(event.key) ? 1 : -1) + controls.length) % controls.length].focus({ preventScroll: true });
   });
   function closeSettings(resume = true) {
     if (settings.hidden) return;

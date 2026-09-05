@@ -43,6 +43,7 @@ for (const type of ['pointerover', 'focusin', 'change']) {
   document.addEventListener(type, event => {
     if (booting || document.body.dataset.view === 'zoom' || document.hidden) return;
     if (type === 'pointerover' && event.pointerType !== 'mouse') return;
+    if (type === 'change' && event.target.matches('input[name="ship"]')) return;
     const now = performance.now();
     if (type === 'focusin' && now - lastInput > 150) return;
     let control = event.target.closest?.('a[href],button,summary,input[type="radio"],input[type="checkbox"],.ship-choices label,.audio-option');
@@ -126,6 +127,7 @@ SHIPS.forEach((ship, index) => {
   label.append(input, art, name);
   document.querySelector('.ship-choices').append(label);
   input.addEventListener('change', () => { preferences.ship = index; savePreferences(); });
+  input.addEventListener('click', () => { void playNavigationSound('select'); });
 });
 
 for (const [id, key] of [['music-enabled', 'music'], ['sfx-enabled', 'sfx']]) {
@@ -155,7 +157,7 @@ tabs.forEach(tab => {
   });
 });
 settings.addEventListener('keydown', event => {
-  if (!['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key)) return;
+  if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) return;
   event.preventDefault();
   event.stopPropagation();
   const controls = [...tabs, ...settings.querySelectorAll('[role="tabpanel"]:not([hidden]) input'), $('settings-close')];
@@ -166,7 +168,7 @@ settings.addEventListener('keydown', event => {
     return;
   }
   const index = controls.indexOf(document.activeElement);
-  controls[(index + (event.key === 'ArrowDown' ? 1 : -1) + controls.length) % controls.length].focus({ preventScroll: true });
+  controls[(index + (['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1) + controls.length) % controls.length].focus({ preventScroll: true });
 });
 function closeSettings(resume = true) {
   if (settings.hidden) return;

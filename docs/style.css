@@ -242,8 +242,9 @@ kbd { font:inherit; color:var(--text); }
 .ship-choices legend { font-size:10px; color:var(--muted); padding:0 0 12px; }
 .ship-choices label { position:relative; padding:12px 4px; display:flex; flex-direction:column; align-items:center; gap:10px; border:1px solid var(--border); border-radius:4px; cursor:pointer; font-size:10px; }
 .ship-choices input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
-.ship-choices label:has(:checked) { border-color:#adf0c0; color:#adf0c0; }
-.ship-choices label:hover,.ship-choices label:has(:focus-visible),.audio-option:hover,.audio-option:has(:focus-visible) { color:#adf0c0; }
+.ship-choices label:has(:checked) { border-color:#adf0c0; color:#adf0c0; background:#adf0c018; }
+.ship-choices label:not(:has(:checked)):hover,.ship-choices label:not(:has(:checked)):has(:focus-visible) { color:var(--link); }
+.audio-option:hover,.audio-option:has(:focus-visible) { color:#adf0c0; }
 .ship-choices label:has(:focus-visible) { outline:2px solid var(--link); outline-offset:2px; }
 .ship-choices pre { font:9px/9px var(--mono); margin:0; font-variant-ligatures:none; }
 .audio-option { display:flex; align-items:center; justify-content:space-between; max-width:320px; min-height:44px; font-size:12px; cursor:pointer; border-bottom:1px solid var(--border); }
