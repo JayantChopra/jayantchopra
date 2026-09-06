@@ -482,9 +482,9 @@
     const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Etc/GMT+12" }).format(now);
     const difference = -12 + now.getTimezoneOffset() / 60;
     const offset = difference === 0 ? "local time" : `${Math.abs(difference)}h ${difference < 0 ? "behind" : "ahead"}`;
-    const strong = document.createElement("strong");
-    strong.textContent = time;
-    document.querySelector("#local-time").replaceChildren(strong, ` - ${offset}`);
+    const clock = document.createElement("span");
+    clock.textContent = time;
+    document.querySelector("#local-time").replaceChildren(clock, ` - ${offset}`);
   }
   showLocalTime();
   setInterval(showLocalTime, 6e4);
