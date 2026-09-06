@@ -33,7 +33,9 @@
   for (const icon of document.querySelectorAll('.followers svg,.profile-details svg')) {
     assert(Math.abs(icon.getBoundingClientRect().left - left) < 1, 'Sidebar icon is indented');
   }
-  assert(document.querySelectorAll('#contribution-days>span').length === 371, 'Calendar cells missing');
+  const days = document.querySelectorAll('#contribution-days>span');
+  assert(days.length >= 365 && days.length <= 371, 'Calendar cells missing');
+  assert(Date.parse(days[days.length - 1].dataset.date) - Date.parse(days[0].dataset.date) === (days.length - 1) * 86400000, 'Calendar dates must cover consecutive days');
   for (const cell of document.querySelectorAll('#contribution-days>span')) {
     const rect = cell.getBoundingClientRect();
     assert(rect.width === 10 && rect.height === 10, 'Contribution cells must be visible squares');

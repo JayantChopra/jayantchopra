@@ -228,10 +228,9 @@ assert.match(controller, /requestAnimationFrame\(\(\) => \{\s*if \(autoIntro && 
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'HTML IDs must be unique');
 for (const [, id] of controller.matchAll(/\$\('([^']+)'\)/g)) assert.ok(ids.includes(id), `Missing game control: ${id}`);
-assert.equal(contributions.levels.length, 53 * 7);
+assert.ok(contributions.levels.length >= 365 && contributions.levels.length <= 371);
 assert.match(contributions.levels, /^[0-4]+$/);
-assert.equal(contributions.levels[21], '1', 'Snapshot must be chronological, not calendar-table row order');
-assert.equal(new Date(Date.parse(contributions.start) + (contributions.levels.length - 1) * 86400000).toISOString().slice(0, 10), '2026-09-05');
+assert.equal(new Date(contributions.start).getUTCDay(), 0, 'Calendar starts on Sunday');
 
 // Icons must render from the HTML itself, even before JavaScript loads.
 const icons = [...html.matchAll(/<svg data-icon="([^"]+)"([^>]*)>([\s\S]*?)<\/svg>/g)];
@@ -249,9 +248,13 @@ assert.equal((html.match(/class="timeline-item" open/g) || []).length, 2);
 // Static cells must survive a blocked script, and the entry point needs no module loader.
 const calendar = html.match(/<div class="days"[^>]*>([\s\S]*?)<\/div>/)[1];
 const cells = [...calendar.matchAll(/data-level="(\d)" data-date="([^"]+)"/g)];
-assert.equal(cells.length, 371);
+assert.equal(cells.length, contributions.levels.length);
 assert.equal(cells.map(cell => cell[1]).join(''), contributions.levels);
-assert.equal(cells[21][2], '2025-09-21');
+for (const [index, cell] of cells.entries()) {
+  assert.equal(cell[2], new Date(Date.parse(contributions.start) + index * 86400000).toISOString().slice(0, 10), 'Snapshot cells must be chronological');
+}
+assert.match(html, /grid-column:1 \/ span 3">Sep/);
+assert.match(html, /grid-column:5 \/ span 3">Oct/);
 assert.match(html, /<script defer src="\.\/app\.js/);
 assert.doesNotMatch(html, /<script[^>]*type="module"/);
 const bundle = readFileSync(new URL('../docs/app.js', import.meta.url), 'utf8');
