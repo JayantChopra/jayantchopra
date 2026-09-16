@@ -224,7 +224,7 @@ delete globalThis.AudioContext;
 const html = readFileSync(new URL('../docs/index.html', import.meta.url), 'utf8');
 const controller = readFileSync(new URL('../docs/game.mjs', import.meta.url), 'utf8');
 assert.doesNotMatch(controller, /introTimer|\$\('avatar'\)\.decode\(\)/, 'Entry must not wait on a timer or the avatar');
-assert.match(controller, /requestAnimationFrame\(\(\) => \{\s*if \(autoIntro && document.body.dataset.view === 'profile'\) focusGame\(\);/);
+assert.match(controller, /if \(!document.hidden && autoIntro && document.body.dataset.view === 'profile'\) focusGame\(\);/);
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'HTML IDs must be unique');
 for (const [, id] of controller.matchAll(/\$\('([^']+)'\)/g)) assert.ok(ids.includes(id), `Missing game control: ${id}`);
@@ -242,7 +242,7 @@ for (const [, name, attributes, paths] of icons) {
 }
 assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
-assert.match(html, /81 percent commits, 16 percent pull requests, 3 percent code review/);
+assert.match(html, /84 percent commits, 14 percent pull requests, 2 percent code review/);
 assert.equal((html.match(/class="timeline-item" open/g) || []).length, 2);
 
 // Static cells must survive a blocked script, and the entry point needs no module loader.
@@ -254,7 +254,8 @@ for (const [index, cell] of cells.entries()) {
   assert.equal(cell[2], new Date(Date.parse(contributions.start) + index * 86400000).toISOString().slice(0, 10), 'Snapshot cells must be chronological');
 }
 assert.match(html, /grid-column:1 \/ span 3">Sep/);
-assert.match(html, /grid-column:5 \/ span 3">Oct/);
+assert.match(html, /grid-column:4 \/ span 3">Oct/);
+assert.match(html, /grid-column:52 \/ span 2">Sep/, 'Final month must fit inside the calendar');
 assert.match(html, /<script defer src="\.\/app\.js/);
 assert.doesNotMatch(html, /<script[^>]*type="module"/);
 const bundle = readFileSync(new URL('../docs/app.js', import.meta.url), 'utf8');

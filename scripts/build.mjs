@@ -14,8 +14,10 @@ const end = start + (contributions.levels.length - 1) * 86400000;
 for (const [index, level] of [...contributions.levels].entries()) {
   const date = new Date(start + index * 86400000);
   days.push(`<span data-level="${level}" data-date="${date.toISOString().slice(0, 10)}"></span>`);
-  if ((index === 0 || date.getUTCDate() === 1) && index < 350) {
-    months.push(`<span style="grid-column:${Math.ceil(index / 7) + 1} / span 3">${monthFormat.format(date)}</span>`);
+  if (index === 0 || date.getUTCDate() === 1) {
+    const column = Math.ceil(index / 7) + 1;
+    const span = Math.min(3, Math.ceil(contributions.levels.length / 7) - column + 1);
+    if (span > 0) months.push(`<span style="grid-column:${column} / span ${span}">${monthFormat.format(date)}</span>`);
   }
 }
 html = html.replace(/(<div class="months"[^>]*>)[\s\S]*?(<\/div>)/, `$1${months.join('')}$2`)

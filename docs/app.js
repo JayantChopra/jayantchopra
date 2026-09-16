@@ -750,6 +750,7 @@
     Object.assign(scene.style, from);
     if (animate && !reducedMotion.matches) {
       camera = scene.animate([from, target], { duration, easing: "cubic-bezier(.45,0,.2,1)", fill: "forwards" });
+      if (document.hidden) camera.pause();
       await camera.finished.catch(() => {
       });
     }
@@ -1100,8 +1101,20 @@
     $("stay-profile").hidden = true;
     $("skip-intro").textContent = "[ play intro ]";
   }
-  requestAnimationFrame(() => {
-    if (autoIntro && document.body.dataset.view === "profile") focusGame();
+  var introFrame;
+  function startVisibleIntro() {
+    cancelAnimationFrame(introFrame);
+    if (document.hidden || !autoIntro) return;
+    introFrame = requestAnimationFrame(() => {
+      introFrame = requestAnimationFrame(() => {
+        if (!document.hidden && autoIntro && document.body.dataset.view === "profile") focusGame();
+      });
+    });
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (camera) document.hidden ? camera.pause() : camera.play();
+    startVisibleIntro();
   });
+  startVisibleIntro();
   requestAnimationFrame(frame);
 })();

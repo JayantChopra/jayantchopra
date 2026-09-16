@@ -234,6 +234,7 @@ async function moveCamera(target, animate, duration) {
   Object.assign(scene.style, from);
   if (animate && !reducedMotion.matches) {
     camera = scene.animate([from, target], { duration, easing: 'cubic-bezier(.45,0,.2,1)', fill: 'forwards' });
+    if (document.hidden) camera.pause();
     await camera.finished.catch(() => {});
   }
   if (id !== transition) return false;
@@ -565,7 +566,20 @@ if (!autoIntro) {
   $('stay-profile').hidden = true;
   $('skip-intro').textContent = '[ play intro ]';
 }
-requestAnimationFrame(() => {
-  if (autoIntro && document.body.dataset.view === 'profile') focusGame();
+let introFrame;
+function startVisibleIntro() {
+  cancelAnimationFrame(introFrame);
+  if (document.hidden || !autoIntro) return;
+  // Paint the profile before starting the camera, including when a new tab becomes visible.
+  introFrame = requestAnimationFrame(() => {
+    introFrame = requestAnimationFrame(() => {
+      if (!document.hidden && autoIntro && document.body.dataset.view === 'profile') focusGame();
+    });
+  });
+}
+document.addEventListener('visibilitychange', () => {
+  if (camera) document.hidden ? camera.pause() : camera.play();
+  startVisibleIntro();
 });
+startVisibleIntro();
 requestAnimationFrame(frame);

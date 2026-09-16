@@ -20,7 +20,7 @@
   const link = document.querySelector('.repo-card h3>a');
   link.focus();
   const preview = document.querySelector('.repo-hovercard');
-  assert(!preview.hidden && preview.textContent.includes('142'), 'Repository preview missing');
+  assert(!preview.hidden && preview.querySelector('.repo-meta').textContent === link.closest('.repo-card').querySelector('.repo-meta').textContent, 'Repository preview stats must match the pinned card');
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   assert(preview.hidden, 'Escape did not close the preview');
   for (const row of document.querySelectorAll('details.timeline-item')) {
