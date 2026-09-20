@@ -253,9 +253,13 @@ assert.equal(cells.map(cell => cell[1]).join(''), contributions.levels);
 for (const [index, cell] of cells.entries()) {
   assert.equal(cell[2], new Date(Date.parse(contributions.start) + index * 86400000).toISOString().slice(0, 10), 'Snapshot cells must be chronological');
 }
-assert.match(html, /grid-column:1 \/ span 3">Sep/);
-assert.match(html, /grid-column:4 \/ span 3">Oct/);
-assert.match(html, /grid-column:52 \/ span 2">Sep/, 'Final month must fit inside the calendar');
+assert.match(html, /grid-column:1 \/ span 2">Sep/);
+assert.match(html, /grid-column:3 \/ span 3">Oct/);
+assert.match(html, /grid-column:51 \/ span 3">Sep/, 'Final month must fit inside the calendar');
+const monthCells = [...html.matchAll(/grid-column:(\d+) \/ span (\d+)">[A-Z][a-z]{2}/g)];
+for (let index = 1; index < monthCells.length; index++) {
+  assert.ok(Number(monthCells[index - 1][1]) + Number(monthCells[index - 1][2]) <= Number(monthCells[index][1]), 'Month labels must not overlap and wrap onto another row');
+}
 assert.match(html, /<script defer src="\.\/app\.js/);
 assert.doesNotMatch(html, /<script[^>]*type="module"/);
 const bundle = readFileSync(new URL('../docs/app.js', import.meta.url), 'utf8');
