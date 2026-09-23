@@ -186,13 +186,23 @@ summary::-webkit-details-marker { display:none; }
 .timeline-item>summary h4 { margin:0; }
 .timeline-item>summary:hover { color:var(--link); }
 .timeline-item:not([open])>summary { margin-bottom:0; }
-.timeline-item[open] .expand-icon,.timeline-item:not([open]) .fold-icon { display:none; }
+.timeline-item[open]>summary .expand-icon,.timeline-item:not([open])>summary .fold-icon,.review-repository[open]>summary .expand-icon,.review-repository:not([open])>summary .fold-icon { display:none; }
 .timeline-item>summary .fold-icon,.timeline-item>summary .expand-icon { margin-left:auto; }
 .timeline-item p { margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .timeline-item p a:first-of-type { text-decoration:underline; }
 .commit-count,.timeline-item time { color:var(--muted); font-size:12px; }
 .commit-count { text-decoration:underline; }
-.commit-bar { height:8px; width:25%; background:#216e39; border-radius:10px; margin:3.5px 0 0 auto; align-self:flex-start; }
+.commit-bar { height:8px; width:25%; margin:3.5px 0 0 auto; align-self:flex-start; }
+.commit-bar i { display:block; height:100%; background:#216e39; border-radius:10px; }
+.timeline-item .additional-commits { margin-top:4.5px; }
+.review-activity { padding-bottom:20px; }
+.review-activity>summary { margin-bottom:9px; }
+.review-repository>summary { display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--muted); list-style:none; line-height:17.5px; }
+.review-repository>summary .commit-count { margin-left:auto; text-decoration:none; }
+.review-repository>summary:hover { color:var(--link); }
+.review-repository p { margin-top:4px; padding:4px 0; min-height:30px; gap:4px; }
+.review-repository p>svg { color:#3fb950; }
+.review-repository p>a { color:var(--text); }
 .timeline-item time { margin-left:auto; }
 .timeline-item .created-repository { justify-content:space-between; align-items:flex-start; gap:0; min-height:22px; }
 .created-repository>span:first-child { width:66.666667%; }

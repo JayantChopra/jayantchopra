@@ -244,6 +244,8 @@ assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /84 percent commits, 14 percent pull requests, 2 percent code review/);
 assert.equal((html.match(/class="timeline-item" open/g) || []).length, 2);
+assert.match(html, /class="timeline-item review-activity" open/);
+assert.match(html, /href="https:\/\/github.com\/JayantChopra\/stanley-mcp-playground\/pull\/1"/);
 
 // Static cells must survive a blocked script, and the entry point needs no module loader.
 const calendar = html.match(/<div class="days"[^>]*>([\s\S]*?)<\/div>/)[1];

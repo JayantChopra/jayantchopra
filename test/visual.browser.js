@@ -30,9 +30,10 @@
     '.activity-chart': [771.484375, 1407.875, 281, 246],
     '.contribution-activity>h2': [352, 1702.875, 746.65625, 24],
     '.commit-bar': [922.25, 1826.875, 176.40625, 8],
-    '.timeline-language': [905.9375, 1914.375, 117.609375, 22],
-    '.more-activity': [352, 2044.375, 746.65625, 38],
-    '.github-footer': [0, 2082.375, 1280, 114],
+    '.timeline-language': [905.9375, 1939.875, 117.609375, 22],
+    '.review-repository>summary': [393, 2031.875, 705.65625, 17.5],
+    '.more-activity': [352, 2191.375, 746.65625, 38],
+    '.github-footer': [0, 2229.375, 1280, 114],
   };
   for (const [selector, values] of Object.entries(expected)) {
     if (innerWidth === 1440) {
@@ -66,7 +67,12 @@
   assert(document.querySelector('.profile-organizations').hidden, 'Organizations are not on the public profile');
   assert(!document.querySelector('#arcade-link'), 'Removed return link reappeared');
   assert(document.querySelector('.overview-grid').children.length === 2, 'Activity markup changed structure');
-  assert(document.querySelectorAll('.timeline-item>summary').length === 2, 'Activity controls missing');
+  assert(document.querySelectorAll('.timeline-item>summary').length === 3, 'Activity controls missing');
+  const review = document.querySelector('.review-repository');
+  review.querySelector('summary').click();
+  assert(!review.open && getComputedStyle(review.querySelector('.expand-icon')).display !== 'none', 'Nested review must expand independently');
+  review.querySelector('summary').click();
+  assert(review.open && getComputedStyle(review.querySelector('.fold-icon')).display !== 'none', 'Nested review must collapse independently');
   assert(document.querySelectorAll('#preview-art .preview-frame').length === 16, 'Shared card animation missing');
   for (const id of ['enter', 'settings-open']) {
     const button = document.getElementById(id), rect = button.getBoundingClientRect();
