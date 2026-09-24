@@ -242,7 +242,7 @@ for (const [, name, attributes, paths] of icons) {
 }
 assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
-assert.match(html, /84 percent commits, 14 percent pull requests, 2 percent code review/);
+assert.match(html, /84 percent commits, 13 percent pull requests, 3 percent code review/);
 assert.equal((html.match(/class="timeline-item" open/g) || []).length, 2);
 assert.match(html, /class="timeline-item review-activity" open/);
 assert.match(html, /href="https:\/\/github.com\/JayantChopra\/stanley-mcp-playground\/pull\/1"/);
