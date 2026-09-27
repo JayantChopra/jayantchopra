@@ -255,9 +255,11 @@ assert.equal(cells.map(cell => cell[1]).join(''), contributions.levels);
 for (const [index, cell] of cells.entries()) {
   assert.equal(cell[2], new Date(Date.parse(contributions.start) + index * 86400000).toISOString().slice(0, 10), 'Snapshot cells must be chronological');
 }
-assert.match(html, /grid-column:1 \/ span 2">Sep/);
-assert.match(html, /grid-column:3 \/ span 3">Oct/);
-assert.match(html, /grid-column:51 \/ span 3">Sep/, 'Final month must fit inside the calendar');
+assert.match(html, /grid-column:1 \/ span 3">Oct/, 'The first partial week belongs to October');
+assert.match(html, /grid-column:5 \/ span 3">Nov/);
+assert.match(html, /grid-column:18 \/ span 3">Feb/, 'Sunday month boundaries label the preceding week');
+assert.match(html, /grid-column:22 \/ span 3">Mar/);
+assert.match(html, /grid-column:49 \/ span 3">Sep/, 'Final month must fit inside the calendar');
 const monthCells = [...html.matchAll(/grid-column:(\d+) \/ span (\d+)">[A-Z][a-z]{2}/g)];
 for (let index = 1; index < monthCells.length; index++) {
   assert.ok(Number(monthCells[index - 1][1]) + Number(monthCells[index - 1][2]) <= Number(monthCells[index][1]), 'Month labels must not overlap and wrap onto another row');

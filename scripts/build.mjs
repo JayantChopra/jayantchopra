@@ -15,9 +15,9 @@ for (const [index, level] of [...contributions.levels].entries()) {
   const date = new Date(start + index * 86400000);
   days.push(`<span data-level="${level}" data-date="${date.toISOString().slice(0, 10)}"></span>`);
   if (index === 0 || date.getUTCDate() === 1) {
-    const column = Math.ceil(index / 7) + 1;
+    const column = Math.max(0, Math.floor((index - 1) / 7)) + 1;
     const nextMonth = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
-    const nextColumn = Math.ceil((nextMonth - start) / 86400000 / 7) + 1;
+    const nextColumn = Math.floor(((nextMonth - start) / 86400000 - 1) / 7) + 1;
     const span = Math.min(3, nextColumn - column, Math.ceil(contributions.levels.length / 7) - column + 1);
     if (span > 0) months.push(`<span style="grid-column:${column} / span ${span}">${monthFormat.format(date)}</span>`);
   }
