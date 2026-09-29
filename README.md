@@ -1,6 +1,6 @@
 ### hey, i'm jay
 
-<img src="https://www.google.com/s2/favicons?domain=polarity.so&sz=16" width="16"/> co-founder & coo @ [polarity](https://www.polarity.so)  
+<img src="https://www.google.com/s2/favicons?domain=polarity.so&sz=16" width="16"/> co-founder & coo (acq.) @ [polarity](https://www.polarity.so)  
 <img src="https://www.google.com/s2/favicons?domain=graypass.org&sz=16" width="16"/> advisor & head of gtm @ [graypass](https://www.graypass.org)  
 <img src="https://www.google.com/s2/favicons?domain=getstanley.ai&sz=16" width="16"/> ops & growth lead @ [stan](https://www.getstanley.ai/welcome)  
 
