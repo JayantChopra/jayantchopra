@@ -19,7 +19,7 @@ for (const [index, level] of [...contributions.levels].entries()) {
     const nextMonth = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
     const nextColumn = Math.floor(((nextMonth - start) / 86400000 - 1) / 7) + 1;
     const span = Math.min(3, nextColumn - column, Math.ceil(contributions.levels.length / 7) - column + 1);
-    if (span > 0) months.push(`<span style="grid-column:${column} / span ${span}">${monthFormat.format(date)}</span>`);
+    if (span > 1) months.push(`<span style="grid-column:${column} / span ${span}">${monthFormat.format(date)}</span>`);
   }
 }
 html = html.replace(/(<div class="months"[^>]*>)[\s\S]*?(<\/div>)/, `$1${months.join('')}$2`)

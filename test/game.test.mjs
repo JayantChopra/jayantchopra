@@ -234,7 +234,7 @@ assert.equal(new Date(contributions.start).getUTCDay(), 0, 'Calendar starts on S
 
 // Icons must render from the HTML itself, even before JavaScript loads.
 const icons = [...html.matchAll(/<svg data-icon="([^"]+)"([^>]*)>([\s\S]*?)<\/svg>/g)];
-assert.ok(icons.length > 60);
+assert.equal(icons.length, 59);
 for (const [, name, attributes, paths] of icons) {
   assert.match(attributes, /viewBox=/, `Missing viewBox: ${name}`);
   assert.match(paths, /<path\b/, `Missing inline paths: ${name}`);
@@ -243,9 +243,9 @@ for (const [, name, attributes, paths] of icons) {
 assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /84 percent commits, 14 percent pull requests, 2 percent code review/);
-assert.equal((html.match(/class="timeline-item" open/g) || []).length, 2);
-assert.match(html, /class="timeline-item review-activity" open/);
-assert.match(html, /href="https:\/\/github.com\/JayantChopra\/stanley-mcp-playground\/pull\/1"/);
+assert.match(html, /October 1, <span>2026<\/span>/);
+assert.match(html, /class="activity-empty"><span>JayantChopra has no activity yet for this period\.<\/span>/);
+assert.doesNotMatch(html, /class="timeline-item/);
 
 // Static cells must survive a blocked script, and the entry point needs no module loader.
 const calendar = html.match(/<div class="days"[^>]*>([\s\S]*?)<\/div>/)[1];
@@ -261,6 +261,7 @@ assert.match(html, /grid-column:18 \/ span 3">Feb/, 'Sunday month boundaries lab
 assert.match(html, /grid-column:22 \/ span 3">Mar/);
 assert.match(html, /grid-column:49 \/ span 3">Sep/, 'Final month must fit inside the calendar');
 const monthCells = [...html.matchAll(/grid-column:(\d+) \/ span (\d+)">[A-Z][a-z]{2}/g)];
+assert.ok(monthCells.every(([, , span]) => Number(span) > 1), 'Single-column months must not display a clipped label');
 for (let index = 1; index < monthCells.length; index++) {
   assert.ok(Number(monthCells[index - 1][1]) + Number(monthCells[index - 1][2]) <= Number(monthCells[index][1]), 'Month labels must not overlap and wrap onto another row');
 }
