@@ -2,7 +2,6 @@
 
 <img src="https://www.google.com/s2/favicons?domain=polarity.so&sz=16" width="16"/> co-founder & coo (acq.) @ [polarity](https://www.polarity.so)  
 <img src="https://www.google.com/s2/favicons?domain=graypass.org&sz=16" width="16"/> advisor & founding AI engineer @ [graypass](https://www.graypass.org) (YC F26) 
-
 <img src="https://www.google.com/s2/favicons?domain=getstanley.ai&sz=16" width="16"/> ops & growth lead @ [stan](https://www.getstanley.ai/welcome)  
 
 <a href="https://jayantchopra.github.io/jayantchopra/"><img src="docs/preview.svg?v=90e18f29aa2d" width="640" alt="Play Space Invaders"/></a>
