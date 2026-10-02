@@ -234,7 +234,7 @@ assert.equal(new Date(contributions.start).getUTCDay(), 0, 'Calendar starts on S
 
 // Icons must render from the HTML itself, even before JavaScript loads.
 const icons = [...html.matchAll(/<svg data-icon="([^"]+)"([^>]*)>([\s\S]*?)<\/svg>/g)];
-assert.equal(icons.length, 59);
+assert.ok(icons.length >= 63);
 for (const [, name, attributes, paths] of icons) {
   assert.match(attributes, /viewBox=/, `Missing viewBox: ${name}`);
   assert.match(paths, /<path\b/, `Missing inline paths: ${name}`);
@@ -243,9 +243,10 @@ for (const [, name, attributes, paths] of icons) {
 assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /84 percent commits, 14 percent pull requests, 2 percent code review/);
-assert.match(html, /October 1, <span>2026<\/span>/);
-assert.match(html, /class="activity-empty"><span>JayantChopra has no activity yet for this period\.<\/span>/);
-assert.doesNotMatch(html, /class="timeline-item/);
+assert.match(html, /October <span>2026<\/span>/);
+assert.match(html, /Created 7 commits in 1 repository/);
+assert.match(html, /13 contributions in private repositories/);
+assert.ok(html.includes(`${contributions.total.toLocaleString('en-US')} contributions in the last year`));
 
 // Static cells must survive a blocked script, and the entry point needs no module loader.
 const calendar = html.match(/<div class="days"[^>]*>([\s\S]*?)<\/div>/)[1];

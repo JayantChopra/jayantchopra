@@ -25,7 +25,7 @@ for (const [index, level] of [...contributions.levels].entries()) {
 html = html.replace(/(<div class="months"[^>]*>)[\s\S]*?(<\/div>)/, `$1${months.join('')}$2`)
   .replace(/(<div class="days"[^>]*>)[\s\S]*?(<\/div>)/, `$1${days.join('')}$2`)
   .replace(/(id="contribution-days"[^>]*aria-label=")[^"]+/, `$1GitHub contribution graph, ${dayFormat.format(start)} through ${dayFormat.format(end)}.`)
-  .replace(/(<h2 id="contributions-heading">)[^<]+/, `$1${contributions.total} contributions in the last year`);
+  .replace(/(<h2 id="contributions-heading">)[^<]+/, `$1${contributions.total.toLocaleString('en-US')} contributions in the last year`);
 writeFileSync(page, html);
 
 writeFileSync(new URL('../docs/preview.svg', import.meta.url), previewSvg());
