@@ -7,26 +7,13 @@ import { previewSvg } from '../docs/preview.mjs';
 const page = new URL('../docs/index.html', import.meta.url);
 let html = readFileSync(page, 'utf8');
 const start = Date.parse(`${contributions.start}T00:00:00Z`);
-const months = [], days = [];
-const monthFormat = new Intl.DateTimeFormat('en', { month: 'short', timeZone: 'UTC' });
+const days = [];
+const months = contributions.months.map(({ label, column }) => `<span style="grid-column:${column} / span 3">${label}</span>`);
 const dayFormat = new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const end = start + (contributions.levels.length - 1) * 86400000;
-// GitHub's month header uses the full yearly range, even on a Sunday rollover.
-const rangeStart = new Date(end - 365 * 86400000);
-const headerStart = rangeStart.getTime() - rangeStart.getUTCDay() * 86400000;
 for (const [index, level] of [...contributions.levels].entries()) {
   const date = new Date(start + index * 86400000);
   days.push(`<span data-level="${level}" data-date="${date.toISOString().slice(0, 10)}"></span>`);
-}
-for (let index = 0; headerStart + index * 86400000 <= end; index++) {
-  const date = new Date(headerStart + index * 86400000);
-  if (index === 0 || date.getUTCDate() === 1) {
-    const column = Math.max(0, Math.floor((index - 1) / 7)) + 1;
-    const nextMonth = Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
-    const nextColumn = Math.floor(((nextMonth - headerStart) / 86400000 - 1) / 7) + 1;
-    const span = Math.min(3, nextColumn - column, Math.ceil(contributions.levels.length / 7) - column + 1);
-    if (span > 1) months.push(`<span style="grid-column:${column} / span ${span}">${monthFormat.format(date)}</span>`);
-  }
 }
 html = html.replace(/(<div class="months"[^>]*>)[\s\S]*?(<\/div>)/, `$1${months.join('')}$2`)
   .replace(/(<div class="days"[^>]*>)[\s\S]*?(<\/div>)/, `$1${days.join('')}$2`)
