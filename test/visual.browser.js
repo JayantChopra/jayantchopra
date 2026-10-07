@@ -65,7 +65,7 @@
   assert(document.querySelector('.profile-organizations').hidden, 'Organizations are not on the public profile');
   assert(!document.querySelector('#arcade-link'), 'Removed return link reappeared');
   assert(document.querySelector('.overview-grid').children.length === 2, 'Activity markup changed structure');
-  assert(document.querySelector('.timeline-item h4').textContent === 'Created 11 commits in 1 repository', 'Current activity missing');
+  assert(document.querySelector('.timeline-item h4').textContent === 'Created 12 commits in 1 repository', 'Current activity missing');
   assert(document.querySelectorAll('#preview-art .preview-frame').length === 16, 'Shared card animation missing');
   for (const id of ['enter', 'settings-open']) {
     const button = document.getElementById(id), rect = button.getBoundingClientRect();
