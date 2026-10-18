@@ -8,7 +8,7 @@ const page = new URL('../docs/index.html', import.meta.url);
 let html = readFileSync(page, 'utf8');
 const start = Date.parse(`${contributions.start}T00:00:00Z`);
 const days = [];
-const months = contributions.months.map(({ label, column }) => `<span style="grid-column:${column} / span ${Math.min(3, 54 - column)}">${label}</span>`);
+const months = contributions.months.map(({ label, column }, index) => `<span style="grid-column:${column} / span ${Math.min(3, (contributions.months[index + 1]?.column ?? 54) - column)}">${label}</span>`);
 const dayFormat = new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const end = start + (contributions.levels.length - 1) * 86400000;
 for (const [index, level] of [...contributions.levels].entries()) {

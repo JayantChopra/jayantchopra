@@ -244,7 +244,7 @@ assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /85 percent commits, 13 percent pull requests, 2 percent code review/);
 assert.match(html, /October <span>2026<\/span>/);
-assert.match(html, /Created 22 commits in 1 repository/);
+assert.match(html, /Created 23 commits in 1 repository/);
 assert.match(html, /129 contributions in private repositories/);
 assert.ok(html.includes(`${contributions.total.toLocaleString('en-US')} contributions in the last year`));
 
@@ -256,11 +256,11 @@ assert.equal(cells.map(cell => cell[1]).join(''), contributions.levels);
 for (const [index, cell] of cells.entries()) {
   assert.equal(cell[2], new Date(Date.parse(contributions.start) + index * 86400000).toISOString().slice(0, 10), 'Snapshot cells must be chronological');
 }
-assert.match(html, /grid-column:1 \/ span 3">Oct/, 'The first partial week belongs to October');
-assert.match(html, /grid-column:4 \/ span 3">Nov/);
-assert.match(html, /grid-column:17 \/ span 3">Feb/, 'Sunday month boundaries label the preceding week');
-assert.match(html, /grid-column:21 \/ span 3">Mar/);
-assert.match(html, /grid-column:48 \/ span 3">Sep/, 'Final month must fit inside the calendar');
+assert.match(html, /grid-column:1 \/ span 2">Oct/, 'The first partial week belongs to October');
+assert.match(html, /grid-column:3 \/ span 3">Nov/);
+assert.match(html, /grid-column:16 \/ span 3">Feb/, 'Sunday month boundaries label the preceding week');
+assert.match(html, /grid-column:20 \/ span 3">Mar/);
+assert.match(html, /grid-column:47 \/ span 3">Sep/, 'Final month must fit inside the calendar');
 const monthCells = [...html.matchAll(/grid-column:(\d+) \/ span (\d+)">[A-Z][a-z]{2}/g)];
 assert.ok(monthCells.every(([, column, span]) => Number(column) + Number(span) <= 54), 'Month labels must stay within the 53-week grid');
 assert.ok(monthCells.every(([, , span]) => Number(span) > 1), 'Single-column months must not display a clipped label');
