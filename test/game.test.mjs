@@ -244,8 +244,8 @@ assert.equal((html.match(/class="nav-menu"/g) || []).length, 5);
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /86 percent commits, 13 percent pull requests, 1 percent code review/);
 assert.match(html, /October <span>2026<\/span>/);
-assert.match(html, /Created 30 commits in 1 repository/);
-assert.match(html, /175 contributions in private repositories/);
+assert.match(html, /Created 31 commits in 1 repository/);
+assert.match(html, /182 contributions in private repositories/);
 assert.ok(html.includes(`${contributions.total.toLocaleString('en-US')} contributions in the last year`));
 
 // Static cells must survive a blocked script, and the entry point needs no module loader.
