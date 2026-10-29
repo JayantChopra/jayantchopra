@@ -387,3 +387,61 @@ kbd { font:inherit; color:var(--text); }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; }
 }
+/* GitHub public navigation, verified October 29, 2026. */
+.nav-featured img { display:block; width:240px; height:150px; object-fit:cover; border-radius:4px; }
+@media (min-width:768px) {
+  .github-header { height:68px; padding:16px; gap:16px; }
+  .global-nav { letter-spacing:.015em; font-size:14px; }
+  .global-nav>a,.nav-menu>summary { height:28px; font-size:14px; padding:0 8px; gap:4px; border-radius:100px; font-weight:400; }
+  .global-nav>a:hover,.nav-menu>summary:hover,.nav-menu[open]>summary { background:#262c28; color:#fff; }
+  .nav-menu { position:static; }
+  .nav-menu[open]>summary svg { transform:rotate(270deg); }
+  .nav-panel { top:68px; left:0; width:100%; max-width:none; border-radius:0; border-top:1px solid #1e2721; border-bottom:1px solid #1e2721; box-shadow:0 12px 24px #01040966; max-height:calc(100dvh - 68px); overflow:auto; }
+  .nav-groups { grid-template-columns:repeat(4,minmax(0,1fr)); grid-auto-columns:auto; grid-auto-flow:row; gap:0; padding:28px 16px; }
+  .nav-group { padding:4px 12px; }
+  .nav-group h2 { text-transform:uppercase; margin:8px 0 16px; font-size:14px; padding:0 12px; }
+  .nav-group a { width:100%; padding:8px 12px; margin-top:8px; font-size:16px; font-weight:400; line-height:24px; }
+  .nav-group a::after { display:none; }
+  .nav-group a:hover { background:#161e18; border-radius:6px; }
+  .nav-group a:hover>span { text-decoration:underline; text-underline-offset:4px; }
+  .nav-group a.nav-feature { grid-template-columns:34px 1fr; gap:0 12px; margin-top:8px; padding:12px; }
+  .nav-group a.nav-feature:first-of-type { margin-top:0; }
+  .nav-feature>svg { grid-column:1; grid-row:1/3; width:34px; height:34px; padding:8px; border:1px solid #1e2721; border-radius:4px; color:#a1ada6; }
+  .nav-feature>span,.nav-feature>small { grid-column:2; }
+  .nav-feature small { color:#a1ada6; font-size:14px; line-height:21px; }
+  .nav-featured { background:#080f0b; }
+  .nav-featured h2 { display:none; }
+  .nav-featured a.nav-feature { display:flex; flex-wrap:wrap; gap:12px; }
+  .nav-featured a>svg { display:none; }
+  .nav-featured a>img { width:100%; height:auto; }
+  .nav-featured a>span { width:100%; }
+  .nav-featured a>small { margin-top:-8px; }
+  [data-menu="products"] .nav-groups { grid-template-columns:42% 29% 29%; padding:28px 16px; }
+  [data-menu="products"] .nav-featured { margin:-28px 24px -28px -16px; padding:28px 4px; }
+  [data-menu="products"] .nav-featured a.nav-feature { display:grid; grid-template-columns:240px 1fr; gap:0 20px; align-items:center; }
+  [data-menu="products"] .nav-featured img { grid-row:1/3; width:240px; height:150px; }
+  [data-menu="products"] .nav-featured a>span { align-self:end; padding-bottom:4px; }
+  [data-menu="products"] .nav-featured a>small { margin:0; align-self:start; }
+  [data-menu="products"] .nav-panel-footer { position:absolute; bottom:0; left:42%; right:0; background:#000; border-color:#1e2721; padding:20px 40px; }
+  [data-menu="products"] .nav-panel-footer a span { color:#3fb950; }
+  .header-actions { letter-spacing:.015em; font-family:var(--sans); font-size:14px; }
+  .github-search { display:flex; width:200px; height:36px; padding:1px 4px 1px 12px; border-color:#353d37; color:#a1ada6; font-weight:500; }
+  .github-search span,.github-search kbd { display:block; }
+  .github-search svg { display:none; }
+  .github-search kbd { font:400 11px/10px "Mona Sans Mono",monospace; height:26px; display:grid; place-items:center; padding:4px 8px; }
+  .header-button { border-color:transparent; }
+  .sign-up { background:#fff; color:#000; }
+  .sign-up:hover { background:#e6e6e6; color:#000; }
+  .appearance { display:flex; }
+}
+@media (min-width:768px) and (max-width:1100px) {
+  .github-search { width:120px; }
+  [data-menu="products"] .nav-featured a.nav-feature { display:flex; }
+  [data-menu="products"] .nav-featured img { width:100%; height:auto; }
+}
+@media (max-width:767px) {
+  .nav-featured img { max-width:100%; height:auto; }
+  .github-header { height:52px; padding:10px 16px; }
+  .mobile-nav-open .global-nav { top:52px; max-height:calc(100dvh - 52px); }
+  .global-nav>a,.nav-menu>summary { font-weight:400; }
+}

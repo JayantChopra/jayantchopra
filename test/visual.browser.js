@@ -1,4 +1,4 @@
-// Public GitHub measurements, 1440px, 1280px or 390px viewport, 2026-09-05. Open ?profile=1.
+// Public GitHub measurements, 1440px, 1280px or 390px viewport, 2026-10-29. Open ?profile=1.
 (async () => {
   const assert = (value, message) => { if (!value) throw Error(message); };
   assert([1440, 1280, 390].includes(innerWidth), 'Use a 1440px, 1280px or 390px viewport for the reference checks');
@@ -13,8 +13,8 @@
     '.achievements': [16, 456, 358, 118],
     '.report-link': [16, 590, 358, 38],
     '.mobile-tabs a': [32, 644, 103.140625, 30],
-    '.readme': [16, 716, 358, 416.125],
-    '#game-shell': [41, 891.875, 308, 173.25],
+    '.readme': [16, 716, 358, 437.125],
+    '#game-shell': [41, 912.875, 308, 173.25],
   } : {
     '#avatar': [32, 113, 296, 296],
     '.user-status': [288, 339, 38, 38],
@@ -38,6 +38,7 @@
       if (selector === '.github-footer') values[2] = 1440;
       else values[0] += 80;
     }
+    values[1] -= mobile ? 12 : 4;
     const rect = document.querySelector(selector).getBoundingClientRect();
     [rect.x, rect.y + scrollY, rect.width, rect.height].forEach((value, i) => {
       assert(Math.abs(value - values[i]) < .6, `${selector}: dimension ${i} differs (${value} vs ${values[i]})`);
@@ -49,15 +50,15 @@
     assert(getComputedStyle(tab).fontWeight === (tab.classList.contains('selected') ? '600' : '400'), 'Only the selected profile tab should be bold');
   }
   for (const tab of document.querySelectorAll('.nav-menu>summary,.global-nav>a')) {
-    assert(getComputedStyle(tab).fontWeight === '500' && getComputedStyle(tab).webkitFontSmoothing === 'antialiased', 'Top navigation should match GitHub font rendering');
+    assert(getComputedStyle(tab).fontWeight === '400' && getComputedStyle(tab).webkitFontSmoothing === 'antialiased', 'Top navigation should match GitHub font rendering');
   }
   if (innerWidth === 1440) {
     const search = document.querySelector('.github-search'), key = search.querySelector('kbd');
     const rect = search.getBoundingClientRect(), shortcut = key.getBoundingClientRect(), style = getComputedStyle(key);
-    assert(rect.width === 200 && rect.height === 32, 'Search dimensions drifted');
-    assert(Math.abs(rect.x - 1002.75) < .6, 'Search horizontal alignment drifted');
-    assert(Math.abs(shortcut.width - 24.84375) < .6 && shortcut.height === 20, 'Search shortcut dimensions drifted');
-    assert(shortcut.y === rect.y + 6 && Math.abs(rect.right - shortcut.right - 13) < .6, 'Search shortcut is not centered or padded correctly');
+    assert(rect.width === 200 && rect.height === 36, 'Search dimensions drifted');
+    assert(Math.abs(rect.x - 1018.75) < .6, 'Search horizontal alignment drifted');
+    assert(Math.abs(shortcut.width - 24.84375) < .6 && shortcut.height === 26, 'Search shortcut dimensions drifted');
+    assert(shortcut.y === rect.y + 5 && Math.abs(rect.right - shortcut.right - 5) < .6, 'Search shortcut is not centered or padded correctly');
     assert(style.fontSize === '11px' && style.lineHeight === '10px' && style.borderRadius === '4px', 'Search shortcut typography drifted');
     assert(getComputedStyle(search).fontWeight === '500', 'Search text should use medium weight');
   }
@@ -65,7 +66,7 @@
   assert(document.querySelector('.profile-organizations').hidden, 'Organizations are not on the public profile');
   assert(!document.querySelector('#arcade-link'), 'Removed return link reappeared');
   assert(document.querySelector('.overview-grid').children.length === 2, 'Activity markup changed structure');
-  assert(document.querySelector('.timeline-item h4').textContent === 'Created 31 commits in 1 repository', 'Current activity missing');
+  assert(document.querySelector('.timeline-item h4').textContent === 'Created 32 commits in 1 repository', 'Current activity missing');
   assert(document.querySelectorAll('#preview-art .preview-frame').length === 16, 'Shared card animation missing');
   for (const id of ['enter', 'settings-open']) {
     const button = document.getElementById(id), rect = button.getBoundingClientRect();

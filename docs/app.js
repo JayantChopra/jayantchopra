@@ -363,6 +363,11 @@
   mobileMenu.addEventListener("click", () => setMobileMenu(mobileMenu.getAttribute("aria-expanded") !== "true"));
   function positionMenu(menu) {
     const panel = menu.querySelector(".nav-panel");
+    if (innerWidth >= 768) {
+      panel.style.maxWidth = "none";
+      panel.style.left = "0px";
+      return;
+    }
     const scale = menu.getBoundingClientRect().width / menu.offsetWidth;
     panel.style.maxWidth = `${(innerWidth - 32) / scale}px`;
     panel.style.left = "0px";
