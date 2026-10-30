@@ -249,7 +249,7 @@ for (const name of ['products', 'developers', 'businesses', 'resources']) {
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /86 percent commits, 13 percent pull requests, 1 percent code review/);
 assert.match(html, /October <span>2026<\/span>/);
-assert.match(html, /Created 32 commits in 1 repository/);
+assert.match(html, /Created 34 commits in 1 repository/);
 assert.match(html, /183 contributions in private repositories/);
 assert.ok(html.includes(`${contributions.total.toLocaleString('en-US')} contributions in the last year`));
 

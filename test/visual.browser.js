@@ -13,8 +13,8 @@
     '.achievements': [16, 456, 358, 118],
     '.report-link': [16, 590, 358, 38],
     '.mobile-tabs a': [32, 644, 103.140625, 30],
-    '.readme': [16, 716, 358, 437.125],
-    '#game-shell': [41, 912.875, 308, 173.25],
+    '.readme': [16, 716, 358, 416.125],
+    '#game-shell': [41, 891.875, 308, 173.25],
   } : {
     '#avatar': [32, 113, 296, 296],
     '.user-status': [288, 339, 38, 38],
@@ -66,7 +66,7 @@
   assert(document.querySelector('.profile-organizations').hidden, 'Organizations are not on the public profile');
   assert(!document.querySelector('#arcade-link'), 'Removed return link reappeared');
   assert(document.querySelector('.overview-grid').children.length === 2, 'Activity markup changed structure');
-  assert(document.querySelector('.timeline-item h4').textContent === 'Created 32 commits in 1 repository', 'Current activity missing');
+  assert(document.querySelector('.timeline-item h4').textContent === 'Created 34 commits in 1 repository', 'Current activity missing');
   assert(document.querySelectorAll('#preview-art .preview-frame').length === 16, 'Shared card animation missing');
   for (const id of ['enter', 'settings-open']) {
     const button = document.getElementById(id), rect = button.getBoundingClientRect();
