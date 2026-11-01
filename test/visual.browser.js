@@ -29,9 +29,9 @@
     '.organizations a': [369, 1360.875, 101.484375, 31],
     '.activity-chart': [771.484375, 1407.875, 281, 246],
     '.contribution-activity>h2': [352, 1702.875, 746.65625, 24],
-    '.timeline-item': [370, 1772.875, 728.65625, 87.5],
-    '.more-activity': [352, 1948.375, 746.65625, 38],
-    '.github-footer': [0, 1986.375, 1280, 114],
+    '.activity-empty': [352, 1772.875, 746.65625, 37],
+    '.more-activity': [352, 1833.875, 746.65625, 38],
+    '.github-footer': [0, 1871.875, 1280, 114],
   };
   for (const [selector, values] of Object.entries(expected)) {
     if (innerWidth === 1440) {
@@ -66,7 +66,7 @@
   assert(document.querySelector('.profile-organizations').hidden, 'Organizations are not on the public profile');
   assert(!document.querySelector('#arcade-link'), 'Removed return link reappeared');
   assert(document.querySelector('.overview-grid').children.length === 2, 'Activity markup changed structure');
-  assert(document.querySelector('.timeline-item h4').textContent === 'Created 34 commits in 1 repository', 'Current activity missing');
+  assert(document.querySelector('.activity-empty').textContent === 'JayantChopra has no activity yet for this period.', 'Current empty activity missing');
   assert(document.querySelectorAll('#preview-art .preview-frame').length === 16, 'Shared card animation missing');
   for (const id of ['enter', 'settings-open']) {
     const button = document.getElementById(id), rect = button.getBoundingClientRect();
