@@ -1,5 +1,6 @@
 ### hey, i'm jay
 
+<img src="https://buyloggi.com/favicon.png" width="16" height="16"/> co-founder & cto @ [loggi](https://buyloggi.com/)<br>
 <img src="https://www.google.com/s2/favicons?domain=polarity.so&sz=16" width="16"/> co-founder & coo (acq.) @ [polarity](https://www.polarity.so)<br>
 <img src="https://www.google.com/s2/favicons?domain=getstanley.ai&sz=16" width="16"/> ops & growth lead @ [stan](https://www.getstanley.ai/welcome)  
 
