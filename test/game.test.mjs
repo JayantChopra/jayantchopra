@@ -248,9 +248,9 @@ for (const name of ['products', 'developers', 'businesses', 'resources']) {
 }
 for (const org of ['stanwith', 'graypass-org']) assert.ok(html.includes(`href="https://github.com/${org}"`));
 assert.match(html, /86 percent commits, 13 percent pull requests, 1 percent code review/);
-assert.match(html, /November 1, <span>2026<\/span>/);
-assert.match(html, /JayantChopra has no activity yet for this period\./);
-assert.doesNotMatch(html, /class="timeline-item"/);
+assert.match(html, /November <span>2026<\/span>/);
+assert.match(html, /Created 5 commits in 1 repository/);
+assert.match(html, /7 contributions in private repositories/);
 assert.ok(html.includes(`${contributions.total.toLocaleString('en-US')} contributions in the last year`));
 
 // Static cells must survive a blocked script, and the entry point needs no module loader.
