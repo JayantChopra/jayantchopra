@@ -1,6 +1,5 @@
 ### hey, i'm jay
 
-<img src="https://buyloggi.com/favicon.png" width="16" height="16"/> co-founder & cto @ [loggi](https://buyloggi.com/)<br>
 <img src="https://www.google.com/s2/favicons?domain=polarity.so&sz=16" width="16"/> co-founder & coo (acq.) @ [polarity](https://www.polarity.so)<br>
 
 <a href="https://jayantchopra.github.io/jayantchopra/"><img src="docs/preview.svg?v=90e18f29aa2d" width="640" alt="Play Space Invaders"/></a>
